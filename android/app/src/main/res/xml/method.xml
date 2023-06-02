@@ -1,0 +1,5 @@
+<input-method xmlns:android="http://schemas.android.com/apk/res/android">
+    <subtype android:name="@string/keyboard_english_name"
+        android:languageTag="en-US"
+        android:imeSubtypeMode="keyboard" />
+</input-method>
