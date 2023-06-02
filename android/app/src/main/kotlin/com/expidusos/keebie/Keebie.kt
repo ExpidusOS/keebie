@@ -9,4 +9,8 @@ class Keebie: InputMethodService() {
             requestLayout()
         }
     }
+
+    override fun onCreateExtractTextView() : View? {
+        return null
+    }
 }

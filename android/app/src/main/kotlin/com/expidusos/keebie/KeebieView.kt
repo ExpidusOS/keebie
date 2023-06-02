@@ -31,8 +31,6 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
         var maxWidth = Math.max(width, displayMetrics.widthPixels)
         var maxHeight = Math.max(height, (displayMetrics.heightPixels / 1.5).toInt())
 
-        println("${maxWidth}x${maxHeight}")
-
         measureChild(view, width, height)
         setMeasuredDimension(
             resolveSizeAndState(maxWidth, width, view.measuredState),
