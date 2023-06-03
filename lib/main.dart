@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/settings': (context) => const MyHomePage(title: 'Settings'),
-        '/keyboard': (context) => const MyHomePage(title: 'Keyboard'),
+        '/keyboard/en-US': (context) => const MyHomePage(title: 'Keyboard'),
       },
     );
   }

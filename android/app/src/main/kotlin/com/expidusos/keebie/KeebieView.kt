@@ -18,7 +18,7 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
     val view = FlutterView(context, surfaceView)
 
     init {
-        engine = engineGroup.createAndRunEngine(context, null, "/keyboard")
+        engine = engineGroup.createAndRunEngine(context, null, "/keyboard/${(context as Keebie).languageTag}")
         surfaceView.attachToRenderer(engine.getRenderer())
         view.attachToFlutterEngine(engine)
         addView(view)
