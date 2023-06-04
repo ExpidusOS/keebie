@@ -2,4 +2,7 @@
     <subtype android:name="@string/keyboard_english_name"
         android:languageTag="en-US"
         android:imeSubtypeMode="keyboard" />
+    <subtype android:name="@string/keyboard_japanese_name"
+        android:languageTag="ja-JP"
+        android:imeSubtypeMode="keyboard" />
 </input-method>
