@@ -2,5 +2,19 @@
   "applicationTitle": "Keebie",
   "keyboardEnglish": "英語",
   "keyboardJapanese": "日本語",
-  "viewSettings": "設定"
+  "viewSettings": "設定",
+  "settingsRestoreDefaults": "Restore default settings",
+  "settingsOptInErrorReporting": "Opt-in to error reporting via Sentry",
+  "settingsOptInErrorReportingSubtitle": "Will take effect after restarting the application",
+  "genericErrorMessage": "Failed to perform action: {errorMessage}",
+  "@genericErrorMessage": {
+    "description": "An error message with no specific meaning",
+    "placeholders": {
+      "errorMessage": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAbout": "About",
+  "aboutHeadingDependencies": "Dependencies"
 }
