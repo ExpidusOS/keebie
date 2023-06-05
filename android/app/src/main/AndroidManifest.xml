@@ -1,11 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="keebie"
+        android:label="@string/application_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <service
             android:name=".Keebie"
-            android:label="@string/keyboard_name"
+            android:label="@string/application_name"
             android:permission="android.permission.BIND_INPUT_METHOD"
             android:exported="true">
             <intent-filter>
@@ -16,7 +16,7 @@
         </service>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/keyboard_name"
+            android:label="@string/application_name"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"

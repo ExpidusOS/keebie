@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="keyboard_name" translatable="true">Keebie</string>
+    <string name="application_name" translatable="true">Keebie</string>
     <string name="keyboard_english_name" translatable="true">English</string>
     <string name="keyboard_japanese_name" translatable="true">Japanese</string>
 </resources>
