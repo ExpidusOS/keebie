@@ -128,8 +128,8 @@ class _KeebieAppState extends State<KeebieApp> {
       ] : null,
       routes: {
         '/settings': (context) => const SettingsView(),
-        '/keyboard/en-US': (context) => const KeyboardView(),
-        '/keyboard/ja-JP': (context) => const KeyboardView(),
+        '/keyboard/en-US': (context) => const KeyboardView(name: 'en-US'),
+        '/keyboard/ja-JP': (context) => const KeyboardView(name: 'ja-JP'),
       },
     );
 }

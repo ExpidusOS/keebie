@@ -39,4 +39,5 @@ flutter:
   generate: true
   assets:
     - assets/imgs/
+    - assets/keyboards/
     - pubspec.yaml
