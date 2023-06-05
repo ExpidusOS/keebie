@@ -1,7 +1,8 @@
 name: keebie
 description: The virtual keyboard for ExpidusOS.
 publish_to: 'none'
-version: 1.0.0+1
+version: 0.1.0+1
+homepage: https://expidusos.com
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -26,6 +27,7 @@ dependencies:
   pubspec: ^2.3.0
   sentry_flutter: ^7.6.3
   shared_preferences: ^2.1.1
+  url_launcher: ^6.1.11
 
 dev_dependencies:
   flutter_test:
@@ -36,4 +38,5 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
+    - assets/imgs/
     - pubspec.yaml

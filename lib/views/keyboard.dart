@@ -1,6 +1,7 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:libtokyo_flutter/libtokyo.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class KeyboardView extends StatefulWidget {
   const KeyboardView({ super.key });
@@ -17,7 +18,8 @@ class _KeyboardViewState extends State<KeyboardView> {
           preferredSize: const Size.fromHeight(kToolbarHeight / 2),
           child: MoveWindow(
             child: WindowBar(
-              title: const Text('Keebie'),
+              leading: Image.asset('assets/imgs/icon.png'),
+              title: Text(AppLocalizations.of(context)!.applicationTitle),
               onMinimize: () => appWindow.minimize(),
               onMaximize: () => appWindow.maximize(),
               onClose: () => appWindow.close(),
