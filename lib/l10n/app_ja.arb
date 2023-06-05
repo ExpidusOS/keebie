@@ -3,10 +3,10 @@
   "keyboardEnglish": "英語",
   "keyboardJapanese": "日本語",
   "viewSettings": "設定",
-  "settingsRestoreDefaults": "Restore default settings",
-  "settingsOptInErrorReporting": "Opt-in to error reporting via Sentry",
-  "settingsOptInErrorReportingSubtitle": "Will take effect after restarting the application",
-  "genericErrorMessage": "Failed to perform action: {errorMessage}",
+  "settingsRestoreDefaults": "初期設定に戻す",
+  "settingsOptInErrorReporting": "Sentry 経由のエラー報告へのオプトイン",
+  "settingsOptInErrorReportingSubtitle": "アプリケーションを再起動した後に有効になります",
+  "genericErrorMessage": "アクションを実行できませんでした: {errorMessage}",
   "@genericErrorMessage": {
     "description": "An error message with no specific meaning",
     "placeholders": {
@@ -15,6 +15,6 @@
       }
     }
   },
-  "viewAbout": "About",
-  "aboutHeadingDependencies": "Dependencies"
+  "viewAbout": "について",
+  "aboutHeadingDependencies": "依存関係"
 }
