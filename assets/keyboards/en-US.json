@@ -34,63 +34,82 @@
     ],
     [
       {
-        "name": "Q"
+        "name": "q",
+        "shiftedName": "Q"
       },
       {
-        "name": "W"
+        "name": "w",
+        "shiftedName": "W"
       },
       {
-        "name": "E"
+        "name": "e",
+        "shiftedName": "E"
       },
       {
-        "name": "R"
+        "name": "r",
+        "shiftedName": "R"
       },
       {
-        "name": "T"
+        "name": "t",
+        "shiftedName": "T"
       },
       {
-        "name": "Y"
+        "name": "y",
+        "shiftedName": "Y"
       },
       {
-        "name": "U"
+        "name": "u",
+        "shiftedName": "U"
       },
       {
-        "name": "I"
+        "name": "i",
+        "shiftedName": "I"
       },
       {
-        "name": "O"
+        "name": "o",
+        "shiftedName": "O"
       },
       {
-        "name": "P"
+        "name": "p",
+        "shiftedName": "P"
       }
     ],
     [
       {
-        "name": "A"
+        "name": "a",
+        "shiftedName": "A"
       },
       {
-        "name": "S"
+        "name": "s",
+        "shiftedName": "S"
       },
       {
-        "name": "D"
+        "name": "d",
+        "shiftedName": "D"
       },
       {
-        "name": "F"
+        "name": "f",
+        "shiftedName": "F"
       },
       {
-        "name": "G"
+        "name": "g",
+        "shiftedName": "G"
       },
       {
-        "name": "H"
+        "name": "h",
+        "shiftedName": "H"
       },
       {
-        "name": "J"
+        "name": "j",
+        "shiftedName": "J"
       },
       {
-        "name": "K"
+        "name": "k",
+        "shiftedName": "K"
       },
       {
-        "name": "L"
+        "name": "l",
+        "shiftedName": "L"
       }
     ],
     [
@@ -100,25 +119,32 @@
         "type": "shift"
       },
       {
-        "name": "Z"
+        "name": "z",
+        "shiftedName": "Z"
       },
       {
-        "name": "X"
+        "name": "x",
+        "shiftedName": "X"
       },
       {
-        "name": "C"
+        "name": "c",
+        "shiftedName": "C"
       },
       {
-        "name": "V"
+        "name": "v",
+        "shiftedName": "V"
       },
       {
-        "name": "B"
+        "name": "b",
+        "shiftedName": "B"
       },
       {
-        "name": "N"
+        "name": "n",
+        "shiftedName": "N"
       },
       {
-        "name": "M"
+        "name": "m",
+        "shiftedName": "M"
       },
       {
         "icon": 57541,
@@ -132,6 +158,9 @@
         "iconFontFamily": "MaterialIcons",
         "type": "plane",
         "plane": 1
+      },
+      {
+        "name": ","
       },
       {
         "icon": 58841,
