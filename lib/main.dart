@@ -15,9 +15,17 @@ import 'views.dart';
 Future<Size> _getWindowSize() async {
   try {
     final value = await const MethodChannel('keebie').invokeMethod('getMonitorGeometry');
-    return Size(value['width']!, value['height']! / 3.15);
+    return Size(value['width']!.toDouble(), value['height']! / 3.15);
   } catch (e) {
     return const Size(600, 450);
+  }
+}
+
+Future<bool> _isKeyboard() async {
+  try {
+    return await const MethodChannel('keebie').invokeMethod('isKeyboard');
+  } catch (e) {
+    return false;
   }
 }
 
@@ -26,14 +34,20 @@ Future<void> _runMain({
   required PubSpec pubspec,
   required List<String> args,
 }) async {
-  final app = KeebieApp(isSentry: isSentry, pubspec: pubspec);
+  final isKeyboard = await _isKeyboard();
+
+  final app = KeebieApp(
+    isSentry: isSentry,
+    isKeyboard: isKeyboard,
+    pubspec: pubspec
+  );
   runApp(isSentry ? DefaultAssetBundle(bundle: SentryAssetBundle(), child: app) : app);
 
   switch (defaultTargetPlatform) {
     case TargetPlatform.windows:
     case TargetPlatform.macOS:
     case TargetPlatform.linux:
-      final initialSize = await _getWindowSize();
+      final initialSize = isKeyboard ? await _getWindowSize() : const Size(600, 450);
       doWhenWindowReady(() {
         final win = appWindow;
 
@@ -85,9 +99,15 @@ Future<void> main(List<String> args) async {
 }
 
 class KeebieApp extends StatefulWidget {
-  const KeebieApp({ super.key, required this.isSentry, required this.pubspec });
+  const KeebieApp({
+    super.key,
+    required this.isSentry,
+    required this.isKeyboard,
+    required this.pubspec
+  });
 
   final bool isSentry;
+  final bool isKeyboard;
   final PubSpec pubspec;
 
   @override
@@ -130,7 +150,7 @@ class _KeebieAppState extends State<KeebieApp> {
       onGenerateTitle: (context) => AppLocalizations.of(context)!.applicationTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      initialRoute: '/keyboard',
+      initialRoute: widget.isKeyboard ? '/keyboard' : '/settings',
       navigatorObservers: widget.isSentry ? [
         SentryNavigatorObserver(
           setRouteNameAsTransaction: true,

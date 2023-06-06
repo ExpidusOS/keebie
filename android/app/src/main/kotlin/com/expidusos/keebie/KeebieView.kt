@@ -102,6 +102,7 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
                         result.success(null)
                     }
                 }
+                "isKeyboard" -> result.success(true)
                 else -> result.notImplemented()
             }
         }
