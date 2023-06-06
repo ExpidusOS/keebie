@@ -12,6 +12,15 @@ import 'constants.dart';
 import 'logic.dart';
 import 'views.dart';
 
+Future<Size> _getWindowSize() async {
+  try {
+    final value = await const MethodChannel('keebie').invokeMethod('getMonitorGeometry');
+    return Size(value['width']!, value['height']! / 3.15);
+  } catch (e) {
+    return const Size(600, 450);
+  }
+}
+
 Future<void> _runMain({
   required bool isSentry,
   required PubSpec pubspec,
@@ -24,9 +33,9 @@ Future<void> _runMain({
     case TargetPlatform.windows:
     case TargetPlatform.macOS:
     case TargetPlatform.linux:
+      final initialSize = await _getWindowSize();
       doWhenWindowReady(() {
         final win = appWindow;
-        const initialSize = Size(600, 450);
 
         win.minSize = initialSize;
         win.size = initialSize;
@@ -121,6 +130,7 @@ class _KeebieAppState extends State<KeebieApp> {
       onGenerateTitle: (context) => AppLocalizations.of(context)!.applicationTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      initialRoute: '/keyboard',
       navigatorObservers: widget.isSentry ? [
         SentryNavigatorObserver(
           setRouteNameAsTransaction: true,
@@ -130,6 +140,24 @@ class _KeebieAppState extends State<KeebieApp> {
         '/settings': (context) => const SettingsView(),
         '/keyboard/en-US': (context) => const KeyboardView(name: 'en-US'),
         '/keyboard/ja-JP': (context) => const KeyboardView(name: 'ja-JP'),
+        '/keyboard': (context) {
+          final locale = Localizations.localeOf(context);
+          var name = locale.languageCode;
+
+          if (locale.countryCode != null) {
+            name += '-${locale.countryCode}';
+          } else {
+            switch (locale.languageCode) {
+              case 'ja':
+                name += '-JP';
+                break;
+              case 'en':
+                name += '-US';
+                break;
+            }
+          }
+          return KeyboardView(name: name);
+        }
       },
     );
 }

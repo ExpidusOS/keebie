@@ -1,6 +1,6 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.10)
-project(runner LANGUAGES CXX)
+project(runner LANGUAGES CXX C)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
@@ -12,6 +12,7 @@ set(APPLICATION_ID "com.expidusos.keebie")
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
 cmake_policy(SET CMP0063 NEW)
+cmake_policy(SET CMP0140 NEW)
 
 # Load bundled libraries from the lib/ directory relative to the binary.
 set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
@@ -46,24 +47,42 @@ function(APPLY_STANDARD_SETTINGS TARGET)
   target_compile_definitions(${TARGET} PRIVATE "$<$<NOT:$<CONFIG:Debug>>:NDEBUG>")
 endfunction()
 
+function(ADD_PLUGIN_SYM TARGET)
+  if(IS_SYMLINK "${TARGET}")
+    file(READ_SYMLINK ${TARGET} TARGET_REAL)
+
+    if(NOT IS_ABSOLUTE "${TARGET_REAL}")
+      get_filename_component(TARGET_DIR "${TARGET}" DIRECTORY)
+      set(TARGET_REAL "${TARGET_DIR}/${TARGET_REAL}")
+    endif()
+
+    add_plugin_sym("${TARGET_REAL}")
+  endif()
+
+  set(PLUGIN_BUNDLED_LIBRARIES "${PLUGIN_BUNDLED_LIBRARIES}" "${TARGET}")
+  return(PROPAGATE PLUGIN_BUNDLED_LIBRARIES)
+endfunction()
+
 # Flutter library and tool build rules.
 set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
 add_subdirectory(${FLUTTER_MANAGED_DIR})
 
 # System-level dependencies.
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
+pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0 gtk+-wayland-3.0)
+pkg_check_modules(WAYLAND REQUIRED IMPORTED_TARGET gtk+-wayland-3.0 wayland-client)
+pkg_check_modules(XKB REQUIRED IMPORTED_TARGET xkbcommon)
+pkg_check_modules(GTK_LAYER_SHELL REQUIRED IMPORTED_TARGET gtk-layer-shell-0)
+
+add_subdirectory(protocols)
 
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
-
-# Define the application target. To change its name, change BINARY_NAME above,
-# not the value here, or `flutter run` will no longer work.
-#
-# Any new source files that you add to the application should be added here.
 add_executable(${BINARY_NAME}
   "main.cc"
-  "my_application.cc"
+  "application.cc"
+  "utils.c"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
+  "${WAYLAND_PROTOCOLS_GEN}"
 )
 
 # Apply the standard set of build settings. This can be removed for applications
@@ -73,6 +92,10 @@ apply_standard_settings(${BINARY_NAME})
 # Add dependency libraries. Add any application-specific dependencies here.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
+target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::WAYLAND)
+target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::XKB)
+target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK_LAYER_SHELL)
+target_link_libraries(${BINARY_NAME} PRIVATE wayland-protocols)
 
 # Run the Flutter tool portions of the build. This must not be removed.
 add_dependencies(${BINARY_NAME} flutter_assemble)
@@ -86,11 +109,13 @@ set_target_properties(${BINARY_NAME}
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/intermediates_do_not_run"
 )
 
-
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.
 include(flutter/generated_plugins.cmake)
-
+list(REMOVE_ITEM WAYLAND_LINK_LIBRARIES z)
+foreach(LIB IN ITEMS ${WAYLAND_LINK_LIBRARIES} ${XKB_LINK_LIBRARIES} ${GTK_LAYER_SHELL_LINK_LIBRARIES})
+  add_plugin_sym("${LIB}")
+endforeach()
 
 # === Installation ===
 # By default, "installing" just makes a relocatable bundle in the build

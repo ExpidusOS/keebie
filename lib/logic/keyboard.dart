@@ -37,7 +37,9 @@ class KeyboardKey {
   };
 }
 
-List<List<List<KeyboardKey>>> decodeKeyboard(String source) => (json.decode(source) as List<dynamic>).map((plane) => (plane as List<dynamic>).map((row) => (row as List<dynamic>).map((keyDynamic) {
+typedef KeyboardLayout = List<List<List<KeyboardKey>>>;
+
+KeyboardLayout decodeKeyboard(String source) => (json.decode(source) as List<dynamic>).map((plane) => (plane as List<dynamic>).map((row) => (row as List<dynamic>).map((keyDynamic) {
   final data = keyDynamic as Map<String, dynamic>;
   return KeyboardKey(
     type: data.containsKey('type') ? KeyboardKeyType.values.firstWhere((e) => e.name == data['type']) : KeyboardKeyType.regular,
