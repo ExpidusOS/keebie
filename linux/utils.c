@@ -9,6 +9,27 @@
 
 #define RANDNAME_PATTERN "/keebie-XXXXXX"
 
+struct LocaleMap {
+  const char* code;
+  const char* name;
+};
+
+static const struct LocaleMap locale_map[] = {
+  { "en-US", "English (US)" },
+  { "ja-JP", "Japanese" }
+};
+static const size_t locale_map_size = sizeof (locale_map) / sizeof (locale_map[0]);
+
+const char* get_locale_name(const char* code) {
+  for (size_t i = 0; i < locale_map_size; i++) {
+    const struct LocaleMap* entry = &locale_map[i];
+    if (strcmp(entry->code, code) == 0) {
+      return entry->name;
+    }
+  }
+  return NULL;
+}
+
 static void randname(char* buf) {
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);

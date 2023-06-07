@@ -1,0 +1,194 @@
+{
+  "locale": "ja-JP",
+  "planes": [
+    [
+      [
+        {
+          "name": "1"
+        },
+        {
+          "name": "2"
+        },
+        {
+          "name": "3"
+        },
+        {
+          "name": "4"
+        },
+        {
+          "name": "5"
+        },
+        {
+          "name": "6"
+        },
+        {
+          "name": "7"
+        },
+        {
+          "name": "8"
+        },
+        {
+          "name": "9"
+        },
+        {
+          "name": "0"
+        }
+      ],
+      [
+        {
+          "name": "た",
+          "shiftedName": "多"
+        },
+        {
+          "name": "て",
+          "shiftedName": "テ"
+        },
+        {
+          "name": "い",
+          "shiftedName": "イ"
+        },
+        {
+          "name": "す",
+          "shiftedName": "ス"
+        },
+        {
+          "name": "か",
+          "shiftedName": "カ"
+        },
+        {
+          "name": "ん",
+          "shiftedName": "ン"
+        },
+        {
+          "name": "な",
+          "shiftedName": "ナ"
+        },
+        {
+          "name": "に",
+          "shiftedName": "二"
+        },
+        {
+          "name": "ら",
+          "shiftedName": "ラ"
+        },
+        {
+          "name": "せ",
+          "shiftedName": "セ"
+        }
+      ],
+      [
+        {
+          "name": "ち",
+          "shiftedName": "千"
+        },
+        {
+          "name": "と",
+          "shiftedName": "ト"
+        },
+        {
+          "name": "し",
+          "shiftedName": "子"
+        },
+        {
+          "name": "は",
+          "shiftedName": "ハ"
+        },
+        {
+          "name": "ぎ",
+          "shiftedName": "ギ"
+        },
+        {
+          "name": "く",
+          "shiftedName": "ク"
+        },
+        {
+          "name": "ま",
+          "shiftedName": "マ"
+        },
+        {
+          "name": "の",
+          "shiftedName": "ノ"
+        },
+        {
+          "name": "り",
+          "shiftedName": "リ"
+        }
+      ],
+      [
+        {
+          "icon": 58198,
+          "iconFontFamily": "MaterialIcons",
+          "type": "shift"
+        },
+        {
+          "name": "つ",
+          "shiftedName": "ツ"
+        },
+        {
+          "name": "さ",
+          "shiftedName": "サ"
+        },
+        {
+          "name": "そ",
+          "shiftedName": "ソ"
+        },
+        {
+          "name": "ひ",
+          "shiftedName": "匕"
+        },
+        {
+          "name": "こ",
+          "shiftedName": "子"
+        },
+        {
+          "name": "み",
+          "shiftedName": "ミ"
+        },
+        {
+          "name": "も",
+          "shiftedName": "モ"
+        },
+        {
+          "icon": 57541,
+          "iconFontFamily": "MaterialIcons",
+          "type": "backspace"
+        }
+      ],
+      [
+        {
+          "icon": 984245,
+          "iconFontFamily": "MaterialIcons",
+          "type": "plane",
+          "plane": 1
+        },
+        {
+          "name": ","
+        },
+        {
+          "icon": 58841,
+          "iconFontFamily": "MaterialIcons",
+          "type": "space",
+          "expands": true
+        },
+        {
+          "name": "."
+        },
+        {
+          "icon": 58202,
+          "iconFontFamily": "MaterialIcons",
+          "type": "enter"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "icon": 984246,
+          "iconFontFamily": "MaterialIcons",
+          "type": "plane",
+          "plane": 0
+        }
+      ]
+    ]
+  ]
+}

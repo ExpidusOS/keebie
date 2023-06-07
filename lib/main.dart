@@ -12,29 +12,12 @@ import 'constants.dart';
 import 'logic.dart';
 import 'views.dart';
 
-Future<Size> _getWindowSize() async {
-  try {
-    final value = await const MethodChannel('keebie').invokeMethod('getMonitorGeometry');
-    return Size(value['width']!.toDouble(), value['height']! / 3.15);
-  } catch (e) {
-    return const Size(600, 450);
-  }
-}
-
-Future<bool> _isKeyboard() async {
-  try {
-    return await const MethodChannel('keebie').invokeMethod('isKeyboard');
-  } catch (e) {
-    return false;
-  }
-}
-
 Future<void> _runMain({
   required bool isSentry,
   required PubSpec pubspec,
   required List<String> args,
 }) async {
-  final isKeyboard = await _isKeyboard();
+  final isKeyboard = await Keebie.isKeyboard;
 
   final app = KeebieApp(
     isSentry: isSentry,
@@ -47,7 +30,7 @@ Future<void> _runMain({
     case TargetPlatform.windows:
     case TargetPlatform.macOS:
     case TargetPlatform.linux:
-      final initialSize = isKeyboard ? await _getWindowSize() : const Size(600, 450);
+      final initialSize = await Keebie.windowSize;
       doWhenWindowReady(() {
         final win = appWindow;
 
@@ -158,26 +141,11 @@ class _KeebieAppState extends State<KeebieApp> {
       ] : null,
       routes: {
         '/settings': (context) => const SettingsView(),
-        '/keyboard/en-US': (context) => const KeyboardView(name: 'en-US'),
-        '/keyboard/ja-JP': (context) => const KeyboardView(name: 'ja-JP'),
-        '/keyboard': (context) {
-          final locale = Localizations.localeOf(context);
-          var name = locale.languageCode;
+        '/keyboard/en': (context) => const KeyboardView(name: 'en'),
+        '/keyboard/ja': (context) => const KeyboardView(name: 'ja'),
 
-          if (locale.countryCode != null) {
-            name += '-${locale.countryCode}';
-          } else {
-            switch (locale.languageCode) {
-              case 'ja':
-                name += '-JP';
-                break;
-              case 'en':
-                name += '-US';
-                break;
-            }
-          }
-          return KeyboardView(name: name);
-        }
+        // TODO: support using method channel to retrieve a "better" name
+        '/keyboard': (context) => KeyboardView(name: Localizations.localeOf(context).languageCode),
       },
     );
 }

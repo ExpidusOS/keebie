@@ -1,0 +1,194 @@
+{
+  "locale": "en-US",
+  "planes": [
+    [
+      [
+        {
+          "name": "1"
+        },
+        {
+          "name": "2"
+        },
+        {
+          "name": "3"
+        },
+        {
+          "name": "4"
+        },
+        {
+          "name": "5"
+        },
+        {
+          "name": "6"
+        },
+        {
+          "name": "7"
+        },
+        {
+          "name": "8"
+        },
+        {
+          "name": "9"
+        },
+        {
+          "name": "0"
+        }
+      ],
+      [
+        {
+          "name": "q",
+          "shiftedName": "Q"
+        },
+        {
+          "name": "w",
+          "shiftedName": "W"
+        },
+        {
+          "name": "e",
+          "shiftedName": "E"
+        },
+        {
+          "name": "r",
+          "shiftedName": "R"
+        },
+        {
+          "name": "t",
+          "shiftedName": "T"
+        },
+        {
+          "name": "y",
+          "shiftedName": "Y"
+        },
+        {
+          "name": "u",
+          "shiftedName": "U"
+        },
+        {
+          "name": "i",
+          "shiftedName": "I"
+        },
+        {
+          "name": "o",
+          "shiftedName": "O"
+        },
+        {
+          "name": "p",
+          "shiftedName": "P"
+        }
+      ],
+      [
+        {
+          "name": "a",
+          "shiftedName": "A"
+        },
+        {
+          "name": "s",
+          "shiftedName": "S"
+        },
+        {
+          "name": "d",
+          "shiftedName": "D"
+        },
+        {
+          "name": "f",
+          "shiftedName": "F"
+        },
+        {
+          "name": "g",
+          "shiftedName": "G"
+        },
+        {
+          "name": "h",
+          "shiftedName": "H"
+        },
+        {
+          "name": "j",
+          "shiftedName": "J"
+        },
+        {
+          "name": "k",
+          "shiftedName": "K"
+        },
+        {
+          "name": "l",
+          "shiftedName": "L"
+        }
+      ],
+      [
+        {
+          "icon": 58198,
+          "iconFontFamily": "MaterialIcons",
+          "type": "shift"
+        },
+        {
+          "name": "z",
+          "shiftedName": "Z"
+        },
+        {
+          "name": "x",
+          "shiftedName": "X"
+        },
+        {
+          "name": "c",
+          "shiftedName": "C"
+        },
+        {
+          "name": "v",
+          "shiftedName": "V"
+        },
+        {
+          "name": "b",
+          "shiftedName": "B"
+        },
+        {
+          "name": "n",
+          "shiftedName": "N"
+        },
+        {
+          "name": "m",
+          "shiftedName": "M"
+        },
+        {
+          "icon": 57541,
+          "iconFontFamily": "MaterialIcons",
+          "type": "backspace"
+        }
+      ],
+      [
+        {
+          "icon": 984245,
+          "iconFontFamily": "MaterialIcons",
+          "type": "plane",
+          "plane": 1
+        },
+        {
+          "name": ","
+        },
+        {
+          "icon": 58841,
+          "iconFontFamily": "MaterialIcons",
+          "type": "space",
+          "expands": true
+        },
+        {
+          "name": "."
+        },
+        {
+          "icon": 58202,
+          "iconFontFamily": "MaterialIcons",
+          "type": "enter"
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "icon": 984246,
+          "iconFontFamily": "MaterialIcons",
+          "type": "plane",
+          "plane": 0
+        }
+      ]
+    ]
+  ]
+}

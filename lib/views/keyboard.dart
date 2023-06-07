@@ -17,7 +17,7 @@ class _KeyboardViewState extends State<KeyboardView> {
   @override
   Widget build(BuildContext context) =>
       Scaffold(
-        windowBar: !kIsWeb && defaultTargetPlatform != TargetPlatform.linux ? PreferredSize(
+        windowBar: !kIsWeb && defaultTargetPlatform != TargetPlatform.linux && defaultTargetPlatform != TargetPlatform.android ? PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight / 2),
           child: MoveWindow(
             child: WindowBar(

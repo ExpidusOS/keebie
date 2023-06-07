@@ -2,10 +2,10 @@ pkg_get_variable(WAYLAND_SCANNER_BINDIR wayland-scanner bindir)
 pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
 
 set(WAYLAND_SCANNER ${WAYLAND_SCANNER_BINDIR}/wayland-scanner)
-set(WAYLAND_PROTOCOLS "${CMAKE_CURRENT_SOURCE_DIR}/virtual-keyboard-unstable-v1.xml")
+set(WAYLAND_PROTOCOLS "${CMAKE_CURRENT_SOURCE_DIR}/input-method-unstable-v2.xml" "${CMAKE_CURRENT_SOURCE_DIR}/virtual-keyboard-unstable-v1.xml")
 set(WAYLAND_PROTOCOLS_GEN)
 
-foreach(PROTO IN ITEMS "${WAYLAND_PROTOCOLS}")
+foreach(PROTO IN ITEMS ${WAYLAND_PROTOCOLS})
   get_filename_component(PROTO_NAME "${PROTO}" NAME_WE)
 
   add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}-client.h"

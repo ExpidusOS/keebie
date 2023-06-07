@@ -1,5 +1,3 @@
-#include <xkbcommon/xkbcommon.h>
-
 #include "application.h"
 #include "window.h"
 #include "utils.h"
@@ -10,13 +8,11 @@ struct _KeebieApplication {
   char** dart_entrypoint_arguments;
   bool launch_settings;
 
-  struct zwp_virtual_keyboard_manager_v1* virtual_keyboard_manager;
-  struct zwp_virtual_keyboard_v1* virtual_keyboard;
-  struct wl_seat* seat;
-
   struct xkb_context* xkb_context;
-  struct xkb_keymap* xkb_keymap;
-  int keymap_fd;
+
+  struct wl_seat* seat;
+  struct zwp_input_method_manager_v2* input_method_manager;
+  struct zwp_virtual_keyboard_manager_v1* virtual_keyboard_manager;
 };
 
 G_DEFINE_TYPE(KeebieApplication, keebie_application, GTK_TYPE_APPLICATION);
@@ -24,12 +20,15 @@ G_DEFINE_TYPE(KeebieApplication, keebie_application, GTK_TYPE_APPLICATION);
 static void wayland_register_global(void* data, struct wl_registry* registry, uint32_t name, const char* iface, uint32_t version) {
   KeebieApplication* self = KEEBIE_APPLICATION(data);
 
-  if (g_strcmp0(iface, zwp_virtual_keyboard_manager_v1_interface.name) == 0) {
-    self->virtual_keyboard_manager = reinterpret_cast<struct zwp_virtual_keyboard_manager_v1*>(wl_registry_bind(registry, name, &zwp_virtual_keyboard_manager_v1_interface, version));
-    g_assert(self->virtual_keyboard_manager != nullptr);
-  } else if (g_strcmp0(iface, wl_seat_interface.name) == 0) {
+  if (g_strcmp0(iface, wl_seat_interface.name) == 0) {
     self->seat = reinterpret_cast<struct wl_seat*>(wl_registry_bind(registry, name, &wl_seat_interface, version));
     g_assert(self->seat != nullptr);
+  } else if (g_strcmp0(iface, zwp_input_method_manager_v2_interface.name) == 0) {
+    self->input_method_manager = reinterpret_cast<struct zwp_input_method_manager_v2*>(wl_registry_bind(registry, name, &zwp_input_method_manager_v2_interface, version));
+    g_assert(self->input_method_manager != nullptr);
+  } else if (g_strcmp0(iface, zwp_virtual_keyboard_manager_v1_interface.name) == 0) {
+    self->virtual_keyboard_manager = reinterpret_cast<struct zwp_virtual_keyboard_manager_v1*>(wl_registry_bind(registry, name, &zwp_virtual_keyboard_manager_v1_interface, version));
+    g_assert(self->virtual_keyboard_manager != nullptr);
   }
 }
 
@@ -46,21 +45,10 @@ static void keebie_application_activate(GApplication* application) {
   self->xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
   g_assert(self->xkb_context != nullptr);
 
-  struct xkb_rule_names names;
-  names.rules = nullptr;
-  names.model = nullptr;
-  names.layout = nullptr;
-  names.variant = nullptr;
-  names.options = nullptr;
-
-  self->xkb_keymap = xkb_keymap_new_from_names(self->xkb_context, &names, XKB_KEYMAP_COMPILE_NO_FLAGS);
-  g_assert(self->xkb_keymap != nullptr);
-
   if (GDK_IS_WAYLAND_DISPLAY(gdisp)) {
     struct wl_display* disp = gdk_wayland_display_get_wl_display(gdisp);
     struct wl_registry* registry = wl_display_get_registry(disp);
 
-    self->virtual_keyboard_manager = nullptr;
     wl_registry_add_listener(registry, &registry_listener, reinterpret_cast<void*>(self));
     wl_display_roundtrip(disp);
   }
@@ -103,19 +91,12 @@ static gboolean keebie_application_local_command_line(GApplication* application,
 
 static void keebie_application_dispose(GObject* object) {
   KeebieApplication* self = KEEBIE_APPLICATION(object);
+
+  g_clear_pointer(&self->xkb_context, xkb_context_unref);
   g_clear_pointer(&self->dart_entrypoint_arguments, g_strfreev);
+  g_clear_pointer(&self->input_method_manager, zwp_input_method_manager_v2_destroy);
+  g_clear_pointer(&self->virtual_keyboard_manager, zwp_virtual_keyboard_manager_v1_destroy);
 
-  if (self->xkb_keymap != nullptr) {
-    xkb_keymap_unref(self->xkb_keymap);
-  }
-
-  if (self->xkb_context != nullptr) {
-    xkb_context_unref(self->xkb_context);
-  }
-
-  if (self->virtual_keyboard_manager != nullptr) {
-    zwp_virtual_keyboard_manager_v1_destroy(self->virtual_keyboard_manager);
-  }
   G_OBJECT_CLASS(keebie_application_parent_class)->dispose(object);
 }
 
@@ -140,14 +121,18 @@ FlDartProject* keebie_application_get_dart_project(KeebieApplication* self) {
   return project;
 }
 
-struct zwp_virtual_keyboard_manager_v1* keebie_application_get_wayland_virtual_keyboard_manager(KeebieApplication* self) {
-  return self->virtual_keyboard_manager;
+struct xkb_context* keebie_application_get_xkb_context(KeebieApplication* self) {
+  return self->xkb_context;
 }
 
 struct wl_seat* keebie_application_get_wayland_seat(KeebieApplication* self) {
   return self->seat;
 }
 
-struct xkb_keymap* keebie_application_get_keymap(KeebieApplication* self) {
-  return self->xkb_keymap;
+struct zwp_input_method_manager_v2* keebie_application_get_input_method_manager(KeebieApplication* self) {
+  return self->input_method_manager;
+}
+
+struct zwp_virtual_keyboard_manager_v1* keebie_application_get_virtual_keyboard_manager(KeebieApplication* self) {
+  return self->virtual_keyboard_manager;
 }

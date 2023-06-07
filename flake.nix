@@ -38,7 +38,6 @@
 
           buildInputs = with pkgs; [
             wayland
-            libxkbcommon
             gtk-layer-shell
           ];
 

@@ -4,7 +4,7 @@ import 'package:keebie/logic.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<KeyboardLayout> Function() onLayoutAsset(String name) =>
-    () async => decodeKeyboard(await rootBundle.loadString('assets/keyboards/$name.json'));
+    () async => KeyboardLayout.fromJson(await rootBundle.loadString('assets/keyboards/$name.json'));
 
 class Keyboard extends StatefulWidget {
   const Keyboard({
@@ -20,7 +20,7 @@ class Keyboard extends StatefulWidget {
     required String json,
     this.plane = 0,
     this.isShifted = false
-  }) : layout = decodeKeyboard(json), onLayout = null;
+  }) : layout = KeyboardLayout.fromJson(json), onLayout = null;
 
   Keyboard.asset({
     super.key,
@@ -43,7 +43,7 @@ class Keyboard extends StatefulWidget {
 class _KeyboardState extends State<Keyboard> {
   late int plane;
   late bool isShifted;
-  final methodChannel = const MethodChannel("keebie");
+  bool isAnnounced = false;
 
   @override
   void initState() {
@@ -53,7 +53,7 @@ class _KeyboardState extends State<Keyboard> {
     isShifted = widget.isShifted;
   }
 
-  Widget buildKey(BuildContext context, KeyboardKey key) {
+  Widget buildKey(BuildContext context, KeyboardLayout layout, KeyboardKey key, int rowNo, int keyNo) {
     var textColor = Colors.white;
     var backgroundColor = ButtonTheme.of(context).colorScheme!.onSurface;
 
@@ -113,12 +113,11 @@ class _KeyboardState extends State<Keyboard> {
               break;
             default:
               setState(() {
-                methodChannel.invokeMethod('sendKey', {
-                  'name': key.name,
-                  'shiftedName': key.shiftedName,
-                  'isShifted': isShifted,
-                  'type': key.type.name,
-                });
+                Keebie.sendKey(key,
+                  isShifted: isShifted,
+                  rowNo: rowNo,
+                  keyNo: keyNo,
+                ).catchError((error, trace) => handleError(error, trace: trace));
 
                 if (isShifted) {
                   isShifted = false;
@@ -136,14 +135,25 @@ class _KeyboardState extends State<Keyboard> {
     return widget;
   }
 
-  Widget buildLayout(BuildContext context, KeyboardLayout layout) =>
-    Column(
+  Widget buildLayout(BuildContext context, KeyboardLayout layout) {
+    if (!isAnnounced) {
+      Keebie.announceLayout(layout).then((nothing) {
+        isAnnounced = true;
+      }).catchError((error, trace) {
+        handleError(error, trace: trace);
+      });
+    }
+
+    return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: layout[plane].map((keys) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: keys.map((key) => buildKey(context, key)).toList(),
-      )).toList()
+      children: layout.planes[plane].asMap().map((rowNo, keys) =>
+        MapEntry(rowNo, Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: keys.asMap().map((keyNo, key) => MapEntry(keyNo, buildKey(context, layout, key, rowNo, keyNo))).values.toList(),
+        ))
+      ).values.toList()
     );
+  }
 
   @override
   Widget build(BuildContext context) {

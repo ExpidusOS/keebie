@@ -71,7 +71,7 @@ add_subdirectory(${FLUTTER_MANAGED_DIR})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0 gtk+-wayland-3.0)
 pkg_check_modules(WAYLAND REQUIRED IMPORTED_TARGET gtk+-wayland-3.0 wayland-client)
-pkg_check_modules(XKB REQUIRED IMPORTED_TARGET xkbcommon)
+pkg_check_modules(XCB REQUIRED IMPORTED_TARGET xkbcommon)
 pkg_check_modules(GTK_LAYER_SHELL REQUIRED IMPORTED_TARGET gtk-layer-shell-0)
 
 add_subdirectory(protocols)
@@ -94,7 +94,7 @@ apply_standard_settings(${BINARY_NAME})
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::WAYLAND)
-target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::XKB)
+target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::XCB)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK_LAYER_SHELL)
 target_link_libraries(${BINARY_NAME} PRIVATE wayland-protocols)
 
@@ -114,7 +114,7 @@ set_target_properties(${BINARY_NAME}
 # them to the application.
 include(flutter/generated_plugins.cmake)
 list(REMOVE_ITEM WAYLAND_LINK_LIBRARIES z)
-foreach(LIB IN ITEMS ${WAYLAND_LINK_LIBRARIES} ${XKB_LINK_LIBRARIES} ${GTK_LAYER_SHELL_LINK_LIBRARIES})
+foreach(LIB IN ITEMS ${WAYLAND_LINK_LIBRARIES} ${XCB_LINK_LIBRARIES} ${GTK_LAYER_SHELL_LINK_LIBRARIES})
   add_plugin_sym("${LIB}")
 endforeach()
 

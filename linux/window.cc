@@ -1,6 +1,7 @@
 #include <bitsdojo_window_linux/bitsdojo_window_plugin.h>
 #include <linux/input-event-codes.h>
 #include <sys/mman.h>
+#include <xkbcommon/xkbcommon.h>
 
 #ifdef GDK_WINDOWING_WAYLAND
 #include <gdk/gdkwayland.h>
@@ -17,8 +18,11 @@ typedef struct _KeebieWindowPrivate {
   FlMethodChannel* method_channel;
   gboolean is_keyboard;
 
+  struct zwp_input_method_v2* input_method;
   struct zwp_virtual_keyboard_v1* virtual_keyboard;
-  int keymap_fd;
+
+  struct xkb_keymap* kmap;
+  int kmap_fd;
 } KeebieWindowPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE(KeebieWindow, keebie_window, GTK_TYPE_APPLICATION_WINDOW);
@@ -44,115 +48,43 @@ static void keebie_window_method_call_cb(FlMethodChannel* channel, FlMethodCall*
     const gchar* arg_name = fl_value_get_string(fl_value_lookup(args, fl_value_new_string("name")));
     const gchar* arg_shifted_name = fl_value_get_string(fl_value_lookup(args, fl_value_new_string("shiftedName")));
     gboolean arg_is_shifted = fl_value_get_bool(fl_value_lookup(args, fl_value_new_string("isShifted")));
+    int64_t arg_row_no = fl_value_get_int(fl_value_lookup(args, fl_value_new_string("rowNo")));
+    int64_t arg_key_no = fl_value_get_int(fl_value_lookup(args, fl_value_new_string("keyNo")));
 
-    if (priv->virtual_keyboard == nullptr) {
-      g_warning("Not implemented: %s %s %s %d", arg_type, arg_name, arg_shifted_name, arg_is_shifted);
-      response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
-    } else {
-      if (arg_is_shifted) arg_name = g_ascii_strdown(arg_shifted_name, -1);
+    (void)arg_name;
+    (void)arg_shifted_name;
+    (void)arg_is_shifted;
 
-      uint32_t code = 0;
-      if (g_strcmp0(arg_type, "backspace") == 0) {
-        code = KEY_BACKSPACE;
-      } else if (g_strcmp0(arg_type, "enter") == 0) {
-        code = KEY_ENTER;
+    if (priv->virtual_keyboard != nullptr) {
+      xkb_keycode_t key = 0;
+      if (g_strcmp0(arg_type, "regular") == 0) {
+        char code = (char)('E' - arg_row_no);
+        gchar* id = g_strdup_printf("A%c%02lu", code, arg_key_no + 1) - 8;
+        key = xkb_keymap_key_by_name(priv->kmap, id);
+        g_free(id);
       } else if (g_strcmp0(arg_type, "space") == 0) {
-        code = KEY_SPACE;
-      } else if (g_strcmp0(arg_type, "regular") == 0) {
-        if (g_strcmp0(arg_name, "1") == 0) {
-          code = KEY_1;
-        } else if (g_strcmp0(arg_name, "2") == 0) {
-          code = KEY_2;
-        } else if (g_strcmp0(arg_name, "3") == 0) {
-          code = KEY_3;
-        } else if (g_strcmp0(arg_name, "4") == 0) {
-          code = KEY_4;
-        } else if (g_strcmp0(arg_name, "5") == 0) {
-          code = KEY_5;
-        } else if (g_strcmp0(arg_name, "6") == 0) {
-          code = KEY_6;
-        } else if (g_strcmp0(arg_name, "7") == 0) {
-          code = KEY_7;
-        } else if (g_strcmp0(arg_name, "8") == 0) {
-          code = KEY_8;
-        } else if (g_strcmp0(arg_name, "9") == 0) {
-          code = KEY_9;
-        } else if (g_strcmp0(arg_name, "0") == 0) {
-          code = KEY_0;
-        } else if (g_strcmp0(arg_name, "a") == 0) {
-          code = KEY_A;
-        } else if (g_strcmp0(arg_name, "b") == 0) {
-          code = KEY_B;
-        } else if (g_strcmp0(arg_name, "c") == 0) {
-          code = KEY_C;
-        } else if (g_strcmp0(arg_name, "d") == 0) {
-          code = KEY_D;
-        } else if (g_strcmp0(arg_name, "e") == 0) {
-          code = KEY_E;
-        } else if (g_strcmp0(arg_name, "f") == 0) {
-          code = KEY_F;
-        } else if (g_strcmp0(arg_name, "g") == 0) {
-          code = KEY_G;
-        } else if (g_strcmp0(arg_name, "h") == 0) {
-          code = KEY_H;
-        } else if (g_strcmp0(arg_name, "i") == 0) {
-          code = KEY_I;
-        } else if (g_strcmp0(arg_name, "j") == 0) {
-          code = KEY_J;
-        } else if (g_strcmp0(arg_name, "k") == 0) {
-          code = KEY_K;
-        } else if (g_strcmp0(arg_name, "l") == 0) {
-          code = KEY_L;
-        } else if (g_strcmp0(arg_name, "m") == 0) {
-          code = KEY_M;
-        } else if (g_strcmp0(arg_name, "n") == 0) {
-          code = KEY_N;
-        } else if (g_strcmp0(arg_name, "o") == 0) {
-          code = KEY_O;
-        } else if (g_strcmp0(arg_name, "p") == 0) {
-          code = KEY_P;
-        } else if (g_strcmp0(arg_name, "q") == 0) {
-          code = KEY_Q;
-        } else if (g_strcmp0(arg_name, "r") == 0) {
-          code = KEY_R;
-        } else if (g_strcmp0(arg_name, "s") == 0) {
-          code = KEY_S;
-        } else if (g_strcmp0(arg_name, "t") == 0) {
-          code = KEY_T;
-        } else if (g_strcmp0(arg_name, "u") == 0) {
-          code = KEY_U;
-        } else if (g_strcmp0(arg_name, "v") == 0) {
-          code = KEY_V;
-        } else if (g_strcmp0(arg_name, "w") == 0) {
-          code = KEY_W;
-        } else if (g_strcmp0(arg_name, "x") == 0) {
-          code = KEY_X;
-        } else if (g_strcmp0(arg_name, "y") == 0) {
-          code = KEY_Y;
-        } else if (g_strcmp0(arg_name, "z") == 0) {
-          code = KEY_Z;
-        } else if (g_strcmp0(arg_name, ".") == 0) {
-          code = KEY_DOT;
-        } else if (g_strcmp0(arg_name, ",") == 0) {
-          code = KEY_COMMA;
-        } else {
-          response = FL_METHOD_RESPONSE(fl_method_error_response_new("regularKey", "Key is not a recognized key event type.", args));
-        }
+        key = KEY_SPACE;
+      } else if (g_strcmp0(arg_type, "enter") == 0) {
+        key = KEY_ENTER;
+      } else if (g_strcmp0(arg_type, "backspace") == 0) {
+        key = KEY_BACKSPACE;
       } else {
-        response = FL_METHOD_RESPONSE(fl_method_error_response_new("unknownKey", "Key type is not a recognized key event type.", args));
+        response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
       }
 
-      if (response == nullptr) {
+      if (key > 0) {
         long t = get_time_ms();
-
         if (arg_is_shifted) zwp_virtual_keyboard_v1_key(priv->virtual_keyboard, t, KEY_LEFTSHIFT, WL_KEYBOARD_KEY_STATE_PRESSED);
 
-        zwp_virtual_keyboard_v1_key(priv->virtual_keyboard, t, code, WL_KEYBOARD_KEY_STATE_PRESSED);
-        zwp_virtual_keyboard_v1_key(priv->virtual_keyboard, t, code, WL_KEYBOARD_KEY_STATE_RELEASED);
+        zwp_virtual_keyboard_v1_key(priv->virtual_keyboard, t, key, WL_KEYBOARD_KEY_STATE_PRESSED);
+        zwp_virtual_keyboard_v1_key(priv->virtual_keyboard, t, key, WL_KEYBOARD_KEY_STATE_RELEASED);
 
         if (arg_is_shifted) zwp_virtual_keyboard_v1_key(priv->virtual_keyboard, t, KEY_LEFTSHIFT, WL_KEYBOARD_KEY_STATE_RELEASED);
+
         response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null()));
       }
+    } else {
+      response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
     }
   } else if (g_strcmp0(method_name, "isKeyboard") == 0) {
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(keebie_window_is_keyboard(self))));
@@ -207,6 +139,137 @@ static void keebie_window_method_call_cb(FlMethodChannel* channel, FlMethodCall*
     gtk_application_add_window(GTK_APPLICATION(self), GTK_WINDOW(new_win));
     gtk_widget_show_all(GTK_WIDGET(new_win));
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null()));
+  } else if (g_strcmp0(method_name, "announceLayout") == 0) {
+    FlValue* args = fl_method_call_get_args(method_call);
+    const gchar* arg_locale = fl_value_get_string(fl_value_lookup(args, fl_value_new_string("locale")));
+    FlValue* arg_planes = fl_value_lookup(args, fl_value_new_string("planes"));
+
+    GString* kmap = g_string_new(nullptr);
+    g_string_append_printf(kmap, "xkb_keymap {\n\txkb_keycodes \"keebie-%s\" {\n\t\tinclude \"evdev\"\n\t};\n\txkb_symbols \"keebie-%s\" {\n", arg_locale, arg_locale);
+
+    size_t i = 0;
+    for (size_t plane_i = 0; plane_i < fl_value_get_length(arg_planes); plane_i++) {
+      FlValue* rows = fl_value_get_list_value(arg_planes, plane_i);
+      for (size_t row_i = 0; row_i < fl_value_get_length(rows); row_i++) {
+        FlValue* keys = fl_value_get_list_value(rows, row_i);
+        for (size_t key_i = 0; key_i < fl_value_get_length(keys); key_i++) {
+          FlValue* key = fl_value_get_list_value(keys, key_i);
+
+          const gchar* key_type = fl_value_get_string(fl_value_lookup(key, fl_value_new_string("type")));
+          const gchar* key_name = fl_value_get_string(fl_value_lookup(key, fl_value_new_string("name")));
+          const gchar* key_shifted_name = fl_value_get_string(fl_value_lookup(key, fl_value_new_string("shiftedName")));
+
+          gboolean needs_comma = FALSE;
+          gboolean did_print = FALSE;
+
+          char code = (char)('E' - row_i);
+
+          if (g_strcmp0(key_type, "regular") == 0) {
+            if (strlen(key_name) > 0) {
+              needs_comma = TRUE;
+              did_print = TRUE;
+
+              wchar_t c;
+              mbstowcs(&c, key_name, sizeof (wchar_t));
+
+              g_string_append_printf(kmap, "\t\tkey <A%d%02lu> { [ U%04X", code, key_i, c);
+            }
+
+            if (strlen(key_shifted_name) > 0) {
+              did_print = TRUE;
+
+              wchar_t c;
+              mbstowcs(&c, key_shifted_name, sizeof (wchar_t));
+
+              if (needs_comma) kmap = g_string_append(kmap, ", ");
+              else g_string_append_printf(kmap, "\t\tkey <A%d%02lu> { [ ", code, key_i);
+
+              g_string_append_printf(kmap, "U%04X", c);
+            }
+          } else if (g_strcmp0(key_type, "space") == 0) {
+            g_string_append_printf(kmap, "\t\tkey <A%d%02lu> { [ space", code, key_i);
+            did_print = TRUE;
+          } else if (g_strcmp0(key_type, "backspace") == 0) {
+            g_string_append_printf(kmap, "\t\tkey <A%d%02lu> { [ BackSpace", code, key_i);
+            did_print = TRUE;
+          }
+
+          if (did_print) {
+            kmap = g_string_append(kmap, " ] };\n");
+            i++;
+          }
+        }
+      }
+    }
+
+    g_string_append_printf(kmap, "\t};\n\txkb_types \"keebie-%s\" {\n\t\tvirtual_modifiers Keebie;\n\t\t", arg_locale);
+    kmap = g_string_append(kmap, "type \"ONE_LEVEL\" { ");
+    kmap = g_string_append(kmap, "level_name[Level1]= \"Any\";");
+    kmap = g_string_append(kmap, "};");
+
+    kmap = g_string_append(kmap, "type \"TWO_LEVEL\" { ");
+    kmap = g_string_append(kmap, "level_name[Level1]= \"Base\";");
+    kmap = g_string_append(kmap, "};");
+
+    kmap = g_string_append(kmap, "type \"ALPHABETIC\" { ");
+    kmap = g_string_append(kmap, "level_name[Level1]= \"Base\";");
+    kmap = g_string_append(kmap, "};");
+
+    kmap = g_string_append(kmap, "type \"KEYPAD\" { ");
+    kmap = g_string_append(kmap, "level_name[Level1]= \"Base\";");
+    kmap = g_string_append(kmap, "};");
+
+    kmap = g_string_append(kmap, "type \"SHIFT + ALT\" { ");
+    kmap = g_string_append(kmap, "level_name[Level1]= \"Base\";");
+
+    g_string_append_printf(kmap, "}; }; xkb_compatibility \"keebie-%s\" { ", arg_locale);
+    kmap = g_string_append(kmap, "interpret Any+AnyOf(all) { ");
+    kmap = g_string_append(kmap, "action= SetMods(modifiers=modMapMods,clearLocks); ");
+    kmap = g_string_append(kmap, "}; }; };");
+
+    gchar* kmap_str = g_string_free_and_steal(kmap);
+    size_t kmap_size = strlen(kmap_str) + 1;
+
+    int rw_fd = -1, ro_fd = -1;
+    if (!allocate_shm_file_pair(kmap_size, &rw_fd, &ro_fd)) {
+      response = FL_METHOD_RESPONSE(fl_method_error_response_new("utils", "Failed to allocate SHM", args));
+    } else {
+      void* dst = mmap(NULL, kmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, rw_fd, 0);
+      if (dst == MAP_FAILED) {
+        close(ro_fd);
+        response = FL_METHOD_RESPONSE(fl_method_error_response_new("utils", "Failed to map memory", args));
+      } else {
+        memcpy(dst, kmap_str, kmap_size);
+      	munmap(dst, kmap_size);
+
+      	if (priv->virtual_keyboard != nullptr) {
+      	  zwp_virtual_keyboard_v1_keymap(
+      	    priv->virtual_keyboard,
+      	    XKB_KEYMAP_FORMAT_TEXT_V1,
+      	    ro_fd,
+      	    kmap_size
+    	    );
+      	}
+
+      	if (priv->kmap_fd > 0) {
+      	  close(priv->kmap_fd);
+      	}
+
+    	  priv->kmap_fd = ro_fd;
+
+      	if (priv->kmap != nullptr) {
+      	  xkb_keymap_unref(priv->kmap);
+      	}
+
+        KeebieApplication* app = KEEBIE_APPLICATION(gtk_window_get_application(GTK_WINDOW(self)));
+      	struct xkb_context* context = keebie_application_get_xkb_context(app);
+      	priv->kmap = xkb_keymap_new_from_string(context, kmap_str, XKB_KEYMAP_FORMAT_TEXT_V1, XKB_KEYMAP_COMPILE_NO_FLAGS);
+      	g_assert(priv->kmap != nullptr);
+      }
+    }
+
+    free(kmap_str);
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null()));
   } else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }
@@ -257,32 +320,14 @@ static void keebie_window_realize(GtkWidget* widget) {
     struct wl_seat* seat = keebie_application_get_wayland_seat(app);
     g_assert(seat != nullptr);
 
-    struct xkb_keymap* keymap = keebie_application_get_keymap(app);
-    g_assert(keymap != nullptr);
+    struct zwp_input_method_manager_v2* input_method_manager = keebie_application_get_input_method_manager(app);
+    if (input_method_manager != nullptr) {
+      priv->input_method = zwp_input_method_manager_v2_get_input_method(input_method_manager, seat);
+    }
 
-    struct zwp_virtual_keyboard_manager_v1* vman = keebie_application_get_wayland_virtual_keyboard_manager(app);
-
-    if (vman != nullptr) {
-      priv->virtual_keyboard = zwp_virtual_keyboard_manager_v1_create_virtual_keyboard(vman, seat);
-      g_assert(priv->virtual_keyboard != nullptr);
-
-      char* keymap_str = xkb_keymap_get_as_string(keymap, XKB_KEYMAP_FORMAT_TEXT_V1);
-      g_assert(keymap_str != nullptr);
-
-      size_t keymap_size = strlen(keymap_str) + 1;
-
-      int rw_fd = -1, ro_fd = -1;
-      g_assert(allocate_shm_file_pair(keymap_size, &rw_fd, &ro_fd));
-
-      void* dst = mmap(NULL, keymap_size, PROT_READ | PROT_WRITE, MAP_SHARED, rw_fd, 0);
-      close(rw_fd);
-      g_assert(dst != MAP_FAILED);
-
-      memcpy(dst, keymap_str, keymap_size);
-      munmap(dst, keymap_size);
-
-      priv->keymap_fd = ro_fd;
-      zwp_virtual_keyboard_v1_keymap(priv->virtual_keyboard, XKB_KEYMAP_FORMAT_TEXT_V1, priv->keymap_fd, keymap_size);
+    struct zwp_virtual_keyboard_manager_v1* virtual_keyboard_manager = keebie_application_get_virtual_keyboard_manager(app);
+    if (virtual_keyboard_manager != nullptr) {
+      priv->virtual_keyboard = zwp_virtual_keyboard_manager_v1_create_virtual_keyboard(virtual_keyboard_manager, seat);
     }
   }
 
@@ -322,16 +367,9 @@ static void keebie_window_dispose(GObject* obj) {
 
   g_clear_object(&priv->method_channel);
   g_clear_object(&priv->view);
-
-  if (priv->virtual_keyboard != nullptr) {
-    zwp_virtual_keyboard_v1_destroy(priv->virtual_keyboard);
-    priv->virtual_keyboard = nullptr;
-  }
-
-  if (priv->keymap_fd > 0) {
-    close(priv->keymap_fd);
-    priv->keymap_fd = 0;
-  }
+  g_clear_pointer(&priv->input_method, zwp_input_method_v2_destroy);
+  g_clear_pointer(&priv->virtual_keyboard, zwp_virtual_keyboard_v1_destroy);
+  g_clear_pointer(&priv->kmap, xkb_keymap_unref);
 
   G_OBJECT_CLASS(keebie_window_parent_class)->dispose(obj);
 }
