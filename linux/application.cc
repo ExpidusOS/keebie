@@ -8,6 +8,7 @@ struct _KeebieApplication {
   GtkApplication parent_instance;
 
   char** dart_entrypoint_arguments;
+  bool launch_settings;
 
   struct zwp_virtual_keyboard_manager_v1* virtual_keyboard_manager;
   struct zwp_virtual_keyboard_v1* virtual_keyboard;
@@ -64,14 +65,29 @@ static void keebie_application_activate(GApplication* application) {
     wl_display_roundtrip(disp);
   }
 
-  KeebieWindow* win = keebie_window_new(self, TRUE);
+  KeebieWindow* win = keebie_window_new(self, !self->launch_settings);
   gtk_application_add_window(GTK_APPLICATION(self), GTK_WINDOW(win));
   gtk_widget_show_all(GTK_WIDGET(win));
 }
 
 static gboolean keebie_application_local_command_line(GApplication* application, gchar*** arguments, int* exit_status) {
   KeebieApplication* self = KEEBIE_APPLICATION(application);
-  self->dart_entrypoint_arguments = g_strdupv(*arguments + 1);
+  size_t dart_i = 0;
+  for (size_t i = 0; (*arguments)[i] != nullptr; i++) {
+    gchar* arg = (*arguments)[i];
+    if (g_strcmp0(arg, "--settings") == 0 || g_strcmp0(arg, "--keyboard") == 0) {
+      self->launch_settings = g_strcmp0(arg, "--settings") == 0;
+    } else {
+      if (self->dart_entrypoint_arguments == nullptr) {
+        self->dart_entrypoint_arguments = reinterpret_cast<char**>(g_malloc0(sizeof (char*)));
+      } else {
+        self->dart_entrypoint_arguments = reinterpret_cast<char**>(g_realloc(self->dart_entrypoint_arguments, sizeof (char*) * (dart_i + 1)));
+      }
+
+      g_assert(self->dart_entrypoint_arguments != nullptr);
+      self->dart_entrypoint_arguments[dart_i++] = g_strdup(arg);
+    }
+  }
 
   g_autoptr(GError) error = nullptr;
   if (!g_application_register(application, nullptr, &error)) {

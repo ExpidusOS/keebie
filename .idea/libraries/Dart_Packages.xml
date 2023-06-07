@@ -110,7 +110,7 @@
         <entry key="flutter">
           <value>
             <list>
-              <option value="/nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/packages/flutter/lib" />
+              <option value="/nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/packages/flutter/lib" />
             </list>
           </value>
         </entry>
@@ -124,21 +124,21 @@
         <entry key="flutter_localizations">
           <value>
             <list>
-              <option value="/nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/packages/flutter_localizations/lib" />
+              <option value="/nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/packages/flutter_localizations/lib" />
             </list>
           </value>
         </entry>
         <entry key="flutter_test">
           <value>
             <list>
-              <option value="/nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/packages/flutter_test/lib" />
+              <option value="/nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/packages/flutter_test/lib" />
             </list>
           </value>
         </entry>
         <entry key="flutter_web_plugins">
           <value>
             <list>
-              <option value="/nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/packages/flutter_web_plugins/lib" />
+              <option value="/nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/packages/flutter_web_plugins/lib" />
             </list>
           </value>
         </entry>
@@ -369,7 +369,7 @@
         <entry key="sky_engine">
           <value>
             <list>
-              <option value="/nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/bin/cache/pkg/sky_engine/lib" />
+              <option value="/nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/bin/cache/pkg/sky_engine/lib" />
             </list>
           </value>
         </entry>
@@ -592,11 +592,11 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/win32-3.1.4/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/xdg_directories-1.0.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/yaml-3.1.2/lib" />
-      <root url="file:///nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/bin/cache/pkg/sky_engine/lib" />
-      <root url="file:///nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/packages/flutter/lib" />
-      <root url="file:///nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/packages/flutter_localizations/lib" />
-      <root url="file:///nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/packages/flutter_test/lib" />
-      <root url="file:///nix/store/6pzqx3mzr7yirgdqsn2v907z15pd30g7-flutter-3.10.0-unwrapped/packages/flutter_web_plugins/lib" />
+      <root url="file:///nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/bin/cache/pkg/sky_engine/lib" />
+      <root url="file:///nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/packages/flutter/lib" />
+      <root url="file:///nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/packages/flutter_localizations/lib" />
+      <root url="file:///nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/packages/flutter_test/lib" />
+      <root url="file:///nix/store/fhjicmbamzghaqyij118l1gpa3xz4zjs-flutter-3.10.0-unwrapped/packages/flutter_web_plugins/lib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
