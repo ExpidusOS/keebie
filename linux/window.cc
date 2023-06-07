@@ -59,8 +59,8 @@ static void keebie_window_method_call_cb(FlMethodChannel* channel, FlMethodCall*
       xkb_keycode_t key = 0;
       if (g_strcmp0(arg_type, "regular") == 0) {
         char code = (char)('E' - arg_row_no);
-        gchar* id = g_strdup_printf("A%c%02lu", code, arg_key_no + 1) - 8;
-        key = xkb_keymap_key_by_name(priv->kmap, id);
+        gchar* id = g_strdup_printf("A%c%02lu", code, arg_key_no + 1);
+        key = xkb_keymap_key_by_name(priv->kmap, id) - 8;
         g_free(id);
       } else if (g_strcmp0(arg_type, "space") == 0) {
         key = KEY_SPACE;
