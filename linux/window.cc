@@ -196,6 +196,17 @@ static void keebie_window_method_call_cb(FlMethodChannel* channel, FlMethodCall*
     } else {
       response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
     }
+  } else if (g_strcmp0(method_name, "openWindow") == 0) {
+    FlValue* args = fl_method_call_get_args(method_call);
+    gboolean arg_keyboard = fl_value_get_bool(fl_value_lookup(args, fl_value_new_string("keyboard")));
+
+    KeebieApplication* app = KEEBIE_APPLICATION(gtk_window_get_application(GTK_WINDOW(self)));
+    g_assert(app != nullptr);
+
+    KeebieWindow* new_win = keebie_window_new(app, arg_keyboard);
+    gtk_application_add_window(GTK_APPLICATION(self), GTK_WINDOW(new_win));
+    gtk_widget_show_all(GTK_WIDGET(new_win));
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null()));
   } else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }
