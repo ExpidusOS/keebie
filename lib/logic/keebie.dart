@@ -30,6 +30,15 @@ class Keebie {
     }
   }
 
+  static Future<KeyboardContentType?> get contentType async {
+    try {
+      final value = await _methodChannel.invokeMethod('getContentType');
+      return KeyboardContentType.values.firstWhere((e) => e.name == value);
+    } catch (e) {
+      return null;
+    }
+  }
+
   static Future<bool> get isKeyboard async {
     try {
       return await _methodChannel.invokeMethod('isKeyboard');

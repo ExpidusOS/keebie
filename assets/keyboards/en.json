@@ -1,5 +1,8 @@
 {
   "locale": "en-US",
+  "contentPlaneMap": {
+    "text": 0
+  },
   "planes": [
     [
       [

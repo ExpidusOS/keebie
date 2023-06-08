@@ -12,6 +12,7 @@ class Keyboard extends StatefulWidget {
     this.layout,
     this.onLayout,
     this.plane = 0,
+    this.contentType,
     this.isShifted = false
   });
 
@@ -19,6 +20,7 @@ class Keyboard extends StatefulWidget {
     super.key,
     required String json,
     this.plane = 0,
+    this.contentType,
     this.isShifted = false
   }) : layout = KeyboardLayout.fromJson(json), onLayout = null;
 
@@ -26,6 +28,7 @@ class Keyboard extends StatefulWidget {
     super.key,
     required String name,
     this.plane = 0,
+    this.contentType,
     this.isShifted = false
   })
     : layout = null,
@@ -33,6 +36,7 @@ class Keyboard extends StatefulWidget {
 
   final int plane;
   final bool isShifted;
+  final KeyboardContentType? contentType;
   final KeyboardLayout? layout;
   final Future<KeyboardLayout> Function()? onLayout;
 
@@ -44,6 +48,7 @@ class _KeyboardState extends State<Keyboard> {
   late int plane;
   late bool isShifted;
   bool isAnnounced = false;
+  KeyboardContentType? contentType;
   List<KeyboardKeyConstraint> constraints = <KeyboardKeyConstraint>[];
 
   @override
@@ -52,12 +57,21 @@ class _KeyboardState extends State<Keyboard> {
 
     plane = widget.plane;
     isShifted = widget.isShifted;
+    contentType = widget.contentType;
 
     Keebie.constraints.then((value) => setState(() {
       constraints = value;
     })).catchError((error, trace) {
       handleError(error, trace: trace);
     });
+
+    if (contentType == null) {
+      Keebie.contentType.then((value) => setState(() {
+        contentType = value;
+      })).catchError((error, trace) {
+        handleError(error, trace: trace);
+      });
+    }
   }
 
   Widget buildKey(BuildContext context, KeyboardLayout layout, KeyboardKey key, int rowNo, int keyNo) {
@@ -157,7 +171,10 @@ class _KeyboardState extends State<Keyboard> {
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: layout.planes[plane].asMap().map((rowNo, keys) =>
+      children: layout.getPlane(
+        plane,
+        contentType: contentType
+      ).asMap().map((rowNo, keys) =>
         MapEntry(rowNo, Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: (keys..retainWhere((key) {

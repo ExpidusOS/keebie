@@ -15,6 +15,13 @@ enum KeyboardKeyConstraint {
   canChangeLanguage
 }
 
+enum KeyboardContentType {
+  dateTime,
+  number,
+  phone,
+  text
+}
+
 class KeyboardKey {
   const KeyboardKey({
     required this.type,
@@ -57,23 +64,45 @@ class KeyboardKey {
 class KeyboardLayout {
   const KeyboardLayout({
     required this.locale,
+    required this.contentPlaneMap,
     required this.planes,
   });
 
   final String locale;
+  final Map<KeyboardContentType, int> contentPlaneMap;
   final List<List<List<KeyboardKey>>> planes;
+
+  List<List<KeyboardKey>> getPlane(int wanted, {
+    KeyboardContentType? contentType,
+  }) {
+    if (contentType != null) {
+      if (contentPlaneMap.containsKey(contentType)) {
+        return getPlane(contentPlaneMap[contentType]!);
+      }
+      return [];
+    }
+
+    if (wanted < 0 || wanted > planes.length) return [];
+    return planes[wanted];
+  }
 
   dynamic toJson() {
     return {
       'locale': locale,
-      'planes': planes.map((plane) => plane.map((row) => row.map((key) => key.toJson()).toList()).toList()).toList()
+      'contentPlaneMap': contentPlaneMap.map((key, value) => MapEntry(key.name, value)),
+      'planes': planes.map((plane) => plane.map((row) => row.map((key) => key.toJson()).toList()).toList()).toList(),
     };
   }
 
   static KeyboardLayout fromJson(String source) {
-    final data = json.decode(source);
+    final data = json.decode(source) as Map<String, dynamic>;
     return KeyboardLayout(
       locale: data['locale'],
+      contentPlaneMap: data.containsKey('contentPlaneMap') ? (data['contentPlaneMap'] as Map<String, dynamic>).map((key, value) =>
+        MapEntry(
+          KeyboardContentType.values.firstWhere((e) => e.name == key),
+          value
+        )) : {},
       planes: (data['planes'] as List<dynamic>).map((plane) => (plane as List<dynamic>).map((row) => (row as List<dynamic>).map((keyDynamic) {
         final data = keyDynamic as Map<String, dynamic>;
         return KeyboardKey(

@@ -3,6 +3,7 @@ package com.expidusos.keebie
 import android.content.Context
 import android.util.AttributeSet
 import android.util.DisplayMetrics
+import android.text.InputType
 import android.view.inputmethod.EditorInfo
 import android.view.ViewGroup
 
@@ -71,6 +72,16 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
                 }
                 "announceLayout" -> result.success(null)
                 "isKeyboard" -> result.success(true)
+                "getContentType" -> {
+                  val info = (context as Keebie).currentInputEditorInfo
+                  result.success(when (info.inputType and InputType.TYPE_MASK_CLASS) {
+                    InputType.TYPE_CLASS_DATETIME -> "dateTime"
+                    InputType.TYPE_CLASS_NUMBER -> "number"
+                    InputType.TYPE_CLASS_PHONE -> "phone"
+                    InputType.TYPE_CLASS_TEXT -> "text"
+                    else -> null
+                  })
+                }
                 "getConstraints" -> {
                   val constraints = emptyList<String>().toMutableList()
                   val keebie = context as Keebie
