@@ -125,11 +125,12 @@ class _KeyboardState extends State<Keyboard> {
     final row = currentPlane.rows[rowNo];
     final size = key.getContainerSize(context: context, row: row);
 
-    Widget widget = Padding(
+    return Padding(
       padding: KeyboardKey.padding,
       child: InkWell(
         child: SizedBox(
           height: size.height,
+          width: size.width,
           child: Material(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
@@ -168,11 +169,6 @@ class _KeyboardState extends State<Keyboard> {
         },
       ),
     );
-
-    return SizedBox(
-      width: size.width,
-      child: widget,
-    );
   }
 
   Widget buildLayout(BuildContext context, KeyboardLayout layout) {
@@ -190,6 +186,9 @@ class _KeyboardState extends State<Keyboard> {
     );
 
     final size = currentPlane.getSize(context, constraints: constraints);
+    final viewSize = MediaQuery.sizeOf(context);
+    final optimalSizeRaw = (size - viewSize) as Offset;
+    final optimalSize = Size(optimalSizeRaw.dx.abs(), optimalSizeRaw.dy.abs());
 
     Widget layoutWidget = Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -210,9 +209,8 @@ class _KeyboardState extends State<Keyboard> {
       case TargetPlatform.windows:
       case TargetPlatform.macOS:
       case TargetPlatform.linux:
-        final winSize = (appWindow.size - size) as Offset;
-        if (winSize != appWindow.size && mounted) {
-          appWindow.minSize = appWindow.size = Size(winSize.dx.abs() / 2, appWindow.size.height);
+        if (optimalSize != appWindow.size && mounted) {
+          appWindow.minSize = appWindow.size = Size(optimalSize.width / 3.1, optimalSize.height / 6);
           appWindow.show();
         }
         break;
@@ -221,8 +219,8 @@ class _KeyboardState extends State<Keyboard> {
     }
 
     return SizedBox(
-      width: size.width,
-      height: size.height,
+      width: optimalSize.width,
+      height: optimalSize.height,
       child: layoutWidget,
     );
   }

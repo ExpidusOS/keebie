@@ -62,7 +62,7 @@ class KeyboardKey {
     final keys = row.getKeys(constraints: constraints);
     final childSize = getChildSize(context);
 
-    var width = expands ? row.plane.findRowByLargest(context, constraints: constraints).getSize(context, constraints: constraints).width / 2
+    var width = expands ? row.plane.findRowByLargest(context, constraints: constraints).getSize(context, constraints: constraints).width * 0.80
         : (MediaQuery.sizeOf(context).width / keys.length);
     var height = ((MediaQuery.sizeOf(context).height / row.plane.length) / 1.5);
 
@@ -123,7 +123,7 @@ class KeyboardRow {
     List<KeyboardKeyConstraint> constraints = const [],
   }) => getKeys(constraints: constraints)
     .map((key) => key.getTotalSize(context: context, row: this))
-    .reduce((v, e) => v + Offset(e.width, e.width));
+    .reduce((v, e) => v + Offset(e.width, e.height));
 }
 
 class KeyboardPlane {
