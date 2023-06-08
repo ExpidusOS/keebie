@@ -156,6 +156,15 @@
       ],
       [
         {
+          "icon": 58214,
+          "iconFontFamily": "MaterialIcons",
+          "type": "changeLang",
+          "constraints": [
+            "canChangeLanguage"
+          ],
+          "plane": 1
+        },
+        {
           "icon": 984245,
           "iconFontFamily": "MaterialIcons",
           "type": "plane",

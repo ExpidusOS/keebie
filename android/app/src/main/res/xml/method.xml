@@ -1,4 +1,7 @@
-<input-method xmlns:android="http://schemas.android.com/apk/res/android">
+<input-method xmlns:android="http://schemas.android.com/apk/res/android"
+    android:supportsSwitchingToNextInputMethod="true"
+    android:settingsActivity="com.expidusos.keebie.SettingsActivity"
+    android:icon="@mipmap/ic_launcher">
     <subtype android:name="@string/keyboard_english_name"
         android:languageTag="en"
         android:imeSubtypeMode="keyboard" />

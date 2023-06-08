@@ -8,6 +8,11 @@ enum KeyboardKeyType {
   backspace,
   space,
   plane,
+  changeLang
+}
+
+enum KeyboardKeyConstraint {
+  canChangeLanguage
 }
 
 class KeyboardKey {
@@ -19,6 +24,7 @@ class KeyboardKey {
     required this.shiftedIcon,
     required this.secondaryColors,
     required this.expands,
+    required this.constrains,
     this.plane,
   });
 
@@ -29,6 +35,7 @@ class KeyboardKey {
   final IconData? shiftedIcon;
   final bool expands;
   final bool secondaryColors;
+  final List<KeyboardKeyConstraint> constrains;
   final int? plane;
 
   dynamic toJson() {
@@ -87,6 +94,10 @@ class KeyboardLayout {
               : null,
           expands: data['expands'] ?? false,
           secondaryColors: data['secondaryColors'] ?? false,
+          constrains: data.containsKey('constraints') ?
+            (data['constraints'] as List<dynamic>)
+              .map((value) => KeyboardKeyConstraint.values.firstWhere((e) => e.name == value)).toList()
+          : [],
           plane: data['plane'],
         );
       }).toList()).toList()).toList(),

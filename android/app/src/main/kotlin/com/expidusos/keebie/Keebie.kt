@@ -3,7 +3,6 @@ package com.expidusos.keebie
 import android.inputmethodservice.InputMethodService
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodSubtype
-import android.util.DisplayMetrics
 import android.view.View
 
 class Keebie: InputMethodService() {
@@ -21,6 +20,7 @@ class Keebie: InputMethodService() {
     }
 
     override fun onCurrentInputMethodSubtypeChanged(subtype: InputMethodSubtype) {
+        println(subtype)
         inputView.engine.navigationChannel.popRoute()
         inputView.engine.navigationChannel.pushRoute("/keyboard/${subtype.languageTag}")
     }

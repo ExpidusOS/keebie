@@ -1,11 +1,9 @@
 package com.expidusos.keebie
 
 import android.content.Context
-import android.os.SystemClock
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.view.inputmethod.EditorInfo
-import android.view.KeyEvent
 import android.view.ViewGroup
 
 import io.flutter.embedding.android.FlutterSurfaceView
@@ -46,8 +44,15 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
                         (context as Keebie).currentInputConnection.performEditorAction(EditorInfo.IME_ACTION_GO)
                         true
                       }
-                      "space" -> (context as Keebie).currentInputConnection.commitText(" ", 0)
-                      "regular" -> (context as Keebie).currentInputConnection.commitText(name, 0)
+                      "changeLang" -> (context as Keebie).switchToNextInputMethod(true)
+                      "space" -> {
+                        (context as Keebie).currentInputConnection.commitText(" ", 0)
+                        true
+                      }
+                      "regular" -> {
+                        (context as Keebie).currentInputConnection.commitText(name, 0)
+                        true
+                      }
                       else -> {
                           result.error(
                             "unknownKey",
@@ -59,10 +64,23 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
                     }
 
                     if (valid) {
-                        result.success(null)
+                      result.success(null)
+                    } else {
+                      result.error(type, "Failed to perform key action", call.arguments)
                     }
                 }
+                "announceLayout" -> result.success(null)
                 "isKeyboard" -> result.success(true)
+                "getConstraints" -> {
+                  val constraints = emptyList<String>().toMutableList()
+                  val keebie = context as Keebie
+
+                  if (keebie.shouldOfferSwitchingToNextInputMethod()) {
+                    constraints += "canChangeLanguage"
+                  }
+
+                  result.success(constraints)
+                }
                 else -> result.notImplemented()
             }
         }

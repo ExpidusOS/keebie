@@ -20,6 +20,16 @@ class Keebie {
   static Future<void> announceLayout(KeyboardLayout layout) =>
     _methodChannel.invokeMethod('announceLayout', layout.toJson());
 
+  static Future<List<KeyboardKeyConstraint>> get constraints async {
+    try {
+      return (await _methodChannel.invokeMethod('getConstraints') as List<dynamic>)
+        .map((value) => KeyboardKeyConstraint.values.firstWhere((e) => e.name == value))
+        .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
   static Future<bool> get isKeyboard async {
     try {
       return await _methodChannel.invokeMethod('isKeyboard');

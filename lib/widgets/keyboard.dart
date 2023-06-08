@@ -44,6 +44,7 @@ class _KeyboardState extends State<Keyboard> {
   late int plane;
   late bool isShifted;
   bool isAnnounced = false;
+  List<KeyboardKeyConstraint> constraints = <KeyboardKeyConstraint>[];
 
   @override
   void initState() {
@@ -51,6 +52,12 @@ class _KeyboardState extends State<Keyboard> {
 
     plane = widget.plane;
     isShifted = widget.isShifted;
+
+    Keebie.constraints.then((value) => setState(() {
+      constraints = value;
+    })).catchError((error, trace) {
+      handleError(error, trace: trace);
+    });
   }
 
   Widget buildKey(BuildContext context, KeyboardLayout layout, KeyboardKey key, int rowNo, int keyNo) {
@@ -90,15 +97,19 @@ class _KeyboardState extends State<Keyboard> {
     }
 
     Widget widget = Padding(
-      padding: const EdgeInsets.all(0.5),
-      child: FloatingActionButton.small(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
+      padding: const EdgeInsets.all(2.0),
+      child: InkWell(
+        child: SizedBox(
+          height: (MediaQuery.sizeOf(context).height / layout.planes[plane].length) / 1.5,
+          child: Material(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            color: backgroundColor,
+            child: Center(child: child),
+          ),
         ),
-        backgroundColor: backgroundColor,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        child: child,
-        onPressed: () {
+        onTap: () {
           switch (key.type) {
             case KeyboardKeyType.plane:
               setState(() {
@@ -129,10 +140,10 @@ class _KeyboardState extends State<Keyboard> {
       ),
     );
 
-    if (key.expands) {
-      widget = Expanded(child: widget);
-    }
-    return widget;
+    return key.expands ? SizedBox(
+      width: MediaQuery.sizeOf(context).width / 2,
+      child: widget,
+    ) : Expanded(child: widget);
   }
 
   Widget buildLayout(BuildContext context, KeyboardLayout layout) {
@@ -149,7 +160,9 @@ class _KeyboardState extends State<Keyboard> {
       children: layout.planes[plane].asMap().map((rowNo, keys) =>
         MapEntry(rowNo, Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: keys.asMap().map((keyNo, key) => MapEntry(keyNo, buildKey(context, layout, key, rowNo, keyNo))).values.toList(),
+          children: (keys..retainWhere((key) {
+            return !key.constrains.map(constraints.contains).contains(false);
+          })).asMap().map((keyNo, key) => MapEntry(keyNo, buildKey(context, layout, key, rowNo, keyNo))).values.toList(),
         ))
       ).values.toList()
     );
