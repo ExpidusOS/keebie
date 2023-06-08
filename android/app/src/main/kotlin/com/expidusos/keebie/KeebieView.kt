@@ -45,7 +45,10 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
                         (context as Keebie).currentInputConnection.performEditorAction(EditorInfo.IME_ACTION_GO)
                         true
                       }
-                      "changeLang" -> (context as Keebie).switchToNextInputMethod(true)
+                      "changeLang" -> {
+                        (context as Keebie).languageTag = (context as Keebie).nextInputMethodSubtype!!.languageTag
+                        true
+                      }
                       "space" -> {
                         (context as Keebie).currentInputConnection.commitText(" ", 0)
                         true
@@ -86,7 +89,7 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
                   val constraints = emptyList<String>().toMutableList()
                   val keebie = context as Keebie
 
-                  if (keebie.shouldOfferSwitchingToNextInputMethod()) {
+                  if (keebie.shouldOfferSwitchingToNextInputMethod() && keebie.nextInputMethodSubtype != null) {
                     constraints += "canChangeLanguage"
                   }
 
