@@ -29,6 +29,8 @@ class _KeyboardViewState extends State<KeyboardView> {
             ),
           ),
         ) : null,
-        body: Keyboard.asset(name: widget.name),
+        body: Center(
+          child: Keyboard.asset(name: widget.name),
+        ),
       );
 }

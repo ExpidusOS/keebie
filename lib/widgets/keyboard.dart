@@ -1,3 +1,5 @@
+import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' hide KeyboardKey;
 import 'package:libtokyo_flutter/libtokyo.dart';
 import 'package:keebie/logic.dart';
@@ -83,15 +85,21 @@ class _KeyboardState extends State<Keyboard> {
       backgroundColor = ButtonTheme.of(context).colorScheme!.onSecondary;
     }
 
+    final textStyle = Theme.of(context).textTheme.labelSmall!.copyWith(
+      color: textColor,
+      fontSize: key.getChildSize(context).height,
+    );
+
     Widget? child;
     if (key.name.isNotEmpty) {
       child = Text(
         key.name,
-        style: Theme.of(context).textTheme.labelSmall!.copyWith(color: textColor),
+        style: textStyle,
       );
     } else if (key.icon != null) {
       child = Icon(
         key.icon!,
+        size: textStyle.fontSize! * 2.0,
         color: textColor
       );
     }
@@ -110,11 +118,18 @@ class _KeyboardState extends State<Keyboard> {
       }
     }
 
+    final currentPlane = layout.getPlane(
+      plane,
+      contentType: contentType
+    );
+    final row = currentPlane.rows[rowNo];
+    final size = key.getContainerSize(context: context, row: row);
+
     Widget widget = Padding(
-      padding: const EdgeInsets.all(2.0),
+      padding: KeyboardKey.padding,
       child: InkWell(
         child: SizedBox(
-          height: (MediaQuery.sizeOf(context).height / layout.planes[plane].length) / 1.5,
+          height: size.height,
           child: Material(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
@@ -154,10 +169,10 @@ class _KeyboardState extends State<Keyboard> {
       ),
     );
 
-    return key.expands ? SizedBox(
-      width: MediaQuery.sizeOf(context).width / 2,
+    return SizedBox(
+      width: size.width,
       child: widget,
-    ) : Expanded(child: widget);
+    );
   }
 
   Widget buildLayout(BuildContext context, KeyboardLayout layout) {
@@ -169,19 +184,46 @@ class _KeyboardState extends State<Keyboard> {
       });
     }
 
-    return Column(
+    final currentPlane = layout.getPlane(
+      plane,
+      contentType: contentType
+    );
+
+    final size = currentPlane.getSize(context, constraints: constraints);
+
+    Widget layoutWidget = Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: layout.getPlane(
-        plane,
-        contentType: contentType
-      ).asMap().map((rowNo, keys) =>
-        MapEntry(rowNo, Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: (keys..retainWhere((key) {
-            return !key.constrains.map(constraints.contains).contains(false);
-          })).asMap().map((keyNo, key) => MapEntry(keyNo, buildKey(context, layout, key, rowNo, keyNo))).values.toList(),
-        ))
-      ).values.toList()
+      children: currentPlane.rows.map((row) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: row.getKeys(constraints: constraints)
+          .asMap()
+          .map((keyNo, key) =>
+            MapEntry(
+              keyNo,
+              buildKey(context, layout, key, row.number, keyNo)
+            )
+          ).values.toList()
+      )).toList(),
+    );
+
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.windows:
+      case TargetPlatform.macOS:
+      case TargetPlatform.linux:
+        final winSize = (appWindow.size - size) as Offset;
+        if (winSize != appWindow.size && mounted) {
+          appWindow.minSize = appWindow.size = Size(winSize.dx.abs() / 2, appWindow.size.height);
+          appWindow.show();
+        }
+        break;
+      default:
+        break;
+    }
+
+    return SizedBox(
+      width: size.width,
+      height: size.height,
+      child: layoutWidget,
     );
   }
 

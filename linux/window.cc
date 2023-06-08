@@ -2,6 +2,7 @@
 #include <linux/input-event-codes.h>
 #include <sys/mman.h>
 #include <xkbcommon/xkbcommon.h>
+#include <math.h>
 
 #ifdef GDK_WINDOWING_WAYLAND
 #include <gdk/gdkwayland.h>
@@ -294,6 +295,41 @@ static gboolean keebie_window_is_keyboard_impl(KeebieWindow* self) {
   return reinterpret_cast<KeebieWindowPrivate*>(keebie_window_get_instance_private(self))->is_keyboard;
 }
 
+gboolean keebie_window_configure_event(GtkWidget* widget, GdkEventConfigure* event) {
+  gboolean result = GTK_WIDGET_CLASS(keebie_window_parent_class)->configure_event(widget, event);
+
+  KeebieWindow* self = KEEBIE_WINDOW(widget);
+  KeebieApplication* app = KEEBIE_APPLICATION(gtk_window_get_application(GTK_WINDOW(self)));
+  g_assert(app != nullptr);
+
+  GdkScreen* screen = gtk_widget_get_screen(GTK_WIDGET(self));
+  g_assert(screen != nullptr);
+
+  GdkWindow* win = gtk_widget_get_window(widget);
+  gboolean is_keyboard = keebie_window_is_keyboard(self);
+
+  GdkDisplay* display = gdk_screen_get_display(screen);
+  g_assert(display != nullptr);
+
+  GdkMonitor* monitor = gdk_display_get_monitor_at_window(display, win);
+  g_assert(monitor != nullptr);
+
+  GdkRectangle geom;
+  gdk_monitor_get_geometry(monitor, &geom);
+
+  gint width;
+  gint height;
+  gtk_window_get_size(GTK_WINDOW(self), &width, &height);
+
+  int horiz = abs((geom.width - width) / 2);
+  if (GDK_IS_WAYLAND_WINDOW(win) && is_keyboard) {
+    gtk_layer_set_margin(GTK_WINDOW(self), GTK_LAYER_SHELL_EDGE_LEFT, horiz);
+    gtk_layer_set_margin(GTK_WINDOW(self), GTK_LAYER_SHELL_EDGE_RIGHT, horiz);
+  }
+
+  return result;
+}
+
 static void keebie_window_realize(GtkWidget* widget) {
   GTK_WIDGET_CLASS(keebie_window_parent_class)->realize(widget);
 
@@ -415,6 +451,7 @@ static void keebie_window_class_init(KeebieWindowClass* klass) {
 
   widget_class->draw = keebie_window_draw;
   widget_class->realize = keebie_window_realize;
+  widget_class->configure_event = keebie_window_configure_event;
 
   obj_properties[PROP_IS_KEYBOARD] = g_param_spec_boolean(
     "is-keyboard",
