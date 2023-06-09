@@ -1,6 +1,7 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' hide KeyboardKey;
+import 'package:keebie/main.dart';
 import 'package:libtokyo_flutter/libtokyo.dart';
 import 'package:keebie/logic.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -87,7 +88,7 @@ class _KeyboardState extends State<Keyboard> {
 
     final textStyle = Theme.of(context).textTheme.labelSmall!.copyWith(
       color: textColor,
-      fontSize: key.getChildSize(context).height,
+      fontSize: key.getChildSize(context, isShifted).height,
     );
 
     Widget? child;
@@ -99,7 +100,7 @@ class _KeyboardState extends State<Keyboard> {
     } else if (key.icon != null) {
       child = Icon(
         key.icon!,
-        size: textStyle.fontSize! * 2.0,
+        size: textStyle.fontSize!,
         color: textColor
       );
     }
@@ -108,11 +109,12 @@ class _KeyboardState extends State<Keyboard> {
       if (key.shiftedName.isNotEmpty) {
         child = Text(
           key.shiftedName,
-          style: Theme.of(context).textTheme.labelSmall!.copyWith(color: textColor),
+          style: textStyle,
         );
       } else if (key.shiftedIcon != null) {
         child = Icon(
           key.shiftedIcon!,
+          size: textStyle.fontSize!,
           color: textColor
         );
       }
@@ -123,7 +125,7 @@ class _KeyboardState extends State<Keyboard> {
       contentType: contentType
     );
     final row = currentPlane.rows[rowNo];
-    final size = key.getContainerSize(context: context, row: row);
+    final size = key.getContainerSize(context: context, row: row, isShifted: isShifted);
 
     return Padding(
       padding: KeyboardKey.padding,
@@ -185,10 +187,8 @@ class _KeyboardState extends State<Keyboard> {
       contentType: contentType
     );
 
-    final size = currentPlane.getSize(context, constraints: constraints);
-    final viewSize = MediaQuery.sizeOf(context);
-    final optimalSizeRaw = (size - viewSize) as Offset;
-    final optimalSize = Size(optimalSizeRaw.dx.abs(), optimalSizeRaw.dy.abs());
+    final size = currentPlane.getSize(context, constraints: constraints, isShifted: isShifted);
+    final realSize = size / MediaQuery.devicePixelRatioOf(context);
 
     Widget layoutWidget = Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -209,18 +209,17 @@ class _KeyboardState extends State<Keyboard> {
       case TargetPlatform.windows:
       case TargetPlatform.macOS:
       case TargetPlatform.linux:
-        if (optimalSize != appWindow.size && mounted) {
-          appWindow.minSize = appWindow.size = Size(optimalSize.width / 3.1, optimalSize.height / 6);
-          appWindow.show();
-        }
+        appWindow.minSize = realSize;
+        appWindow.size = realSize;
+        appWindow.show();
         break;
       default:
         break;
     }
 
     return SizedBox(
-      width: optimalSize.width,
-      height: optimalSize.height,
+      width: size.width,
+      height: size.height,
       child: layoutWidget,
     );
   }

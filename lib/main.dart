@@ -18,10 +18,12 @@ Future<void> _runMain({
   required List<String> args,
 }) async {
   final isKeyboard = await Keebie.isKeyboard;
+  final initialSize = await Keebie.windowSize;
 
   final app = KeebieApp(
     isSentry: isSentry,
     isKeyboard: isKeyboard,
+    initialSize: initialSize,
     pubspec: pubspec
   );
   runApp(isSentry ? DefaultAssetBundle(bundle: SentryAssetBundle(), child: app) : app);
@@ -30,7 +32,6 @@ Future<void> _runMain({
     case TargetPlatform.windows:
     case TargetPlatform.macOS:
     case TargetPlatform.linux:
-      final initialSize = await Keebie.windowSize;
       doWhenWindowReady(() {
         final win = appWindow;
 
@@ -86,11 +87,13 @@ class KeebieApp extends StatefulWidget {
     super.key,
     required this.isSentry,
     required this.isKeyboard,
+    required this.initialSize,
     required this.pubspec
   });
 
   final bool isSentry;
   final bool isKeyboard;
+  final Size initialSize;
   final PubSpec pubspec;
 
   @override
@@ -98,6 +101,7 @@ class KeebieApp extends StatefulWidget {
 
   static Future<void> reload(BuildContext context) => context.findAncestorStateOfType<_KeebieAppState>()!.reload();
   static bool isSentryOnContext(BuildContext context) => context.findAncestorWidgetOfExactType<KeebieApp>()!.isSentry;
+  static Size getInitialSize(BuildContext context) => context.findAncestorWidgetOfExactType<KeebieApp>()!.initialSize;
   static PubSpec getPubSpec(BuildContext context) => context.findAncestorWidgetOfExactType<KeebieApp>()!.pubspec;
 }
 

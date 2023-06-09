@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:keebie/logic.dart';
+import 'package:keebie/main.dart';
 import 'package:libtokyo_flutter/libtokyo.dart';
 
 enum KeyboardKeyType {
@@ -48,8 +49,8 @@ class KeyboardKey {
   final List<KeyboardKeyConstraint> constrains;
   final int? plane;
 
-  Size getChildSize(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.labelSmall!;
+  Size getChildSize(BuildContext context, bool isShifted) {
+    final textStyle = Theme.of(context).textTheme.displaySmall!;
     return Size.square(name.isNotEmpty ? textStyle.fontSize!
       : (icon != null ? textStyle.fontSize! : 0.0));
   }
@@ -57,14 +58,18 @@ class KeyboardKey {
   Size getContainerSize({
     required BuildContext context,
     required KeyboardRow row,
+    required bool isShifted,
     List<KeyboardKeyConstraint> constraints = const [],
   }) {
     final keys = row.getKeys(constraints: constraints);
-    final childSize = getChildSize(context);
+    final childSize = getChildSize(context, isShifted);
 
-    var width = expands ? row.plane.findRowByLargest(context, constraints: constraints).getSize(context, constraints: constraints).width * 0.80
-        : (MediaQuery.sizeOf(context).width / keys.length);
-    var height = ((MediaQuery.sizeOf(context).height / row.plane.length) / 1.5);
+    final initialSize = KeebieApp.getInitialSize(context);
+
+    var width = expands ? row.plane.findRowByLargest(context, constraints: constraints, isShifted: isShifted)
+          .getSize(context, constraints: constraints, isShifted: isShifted).width * 0.80
+        : (initialSize.width / keys.length);
+    var height = ((initialSize.height / row.plane.length) / 1.5);
 
     if (!expands) {
       height = height.clamp(childSize.height, childSize.height * 4) + KeyboardKey.padding.vertical;
@@ -79,9 +84,10 @@ class KeyboardKey {
   Size getTotalSize({
     required BuildContext context,
     required KeyboardRow row,
+    required bool isShifted,
     List<KeyboardKeyConstraint> constraints = const [],
-  }) => getContainerSize(context: context, row: row, constraints: constraints)
-    + Offset(padding.horizontal, padding.vertical);
+  }) => getContainerSize(context: context, row: row, constraints: constraints, isShifted: isShifted)
+    + Offset(padding.horizontal * 2, padding.vertical * 2);
 
   dynamic toJson() {
     return {
@@ -120,10 +126,11 @@ class KeyboardRow {
   }
 
   Size getSize(BuildContext context, {
+    required bool isShifted,
     List<KeyboardKeyConstraint> constraints = const [],
   }) => getKeys(constraints: constraints)
-    .map((key) => key.getTotalSize(context: context, row: this))
-    .reduce((v, e) => v + Offset(e.width, e.height));
+    .map((key) => key.getTotalSize(context: context, row: this, isShifted: isShifted))
+    .reduce((v, e) => Size(v.width + e.width, e.height > v.height ? e.height : v.height));
 }
 
 class KeyboardPlane {
@@ -149,18 +156,20 @@ class KeyboardPlane {
     });
 
   KeyboardRow findRowByLargest(BuildContext context, {
+    required bool isShifted,
     List<KeyboardKeyConstraint> constraints = const [],
     bool allowExpanded = false,
   }) {
     final r = allowExpanded ? rows : getFixedSizeRows(constraints: constraints);
-    return rows[r.asMap().map((i, row) => MapEntry(row.number, row.getSize(context, constraints: constraints)))
+    return rows[r.asMap().map((i, row) => MapEntry(row.number, row.getSize(context, constraints: constraints, isShifted: isShifted)))
         .entries.reduce((v, e) => e.value > v.value ? e : v).key];
   }
 
   Size getSize(BuildContext context, {
+    required bool isShifted,
     List<KeyboardKeyConstraint> constraints = const [],
-  }) => rows.map((row) => row.getSize(context, constraints: constraints))
-    .reduce((v, e) => v + Offset(e.width, e.height));
+  }) => rows.map((row) => row.getSize(context, constraints: constraints, isShifted: isShifted))
+    .reduce((v, e) => Size(e.width > v.width ? e.width : v.width, v.height + e.height));
 }
 
 class KeyboardLayout {
