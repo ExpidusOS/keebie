@@ -13,6 +13,6 @@ import 'package:pubspec/pubspec.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const KeebieApp(isSentry: false, isKeyboard: true, pubspec: PubSpec()));
+    await tester.pumpWidget(const KeebieApp(isSentry: false, isKeyboard: true, pubspec: PubSpec(), initialSize: Size(600, 400)));
   });
 }

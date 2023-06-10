@@ -77,7 +77,7 @@ class _KeyboardState extends State<Keyboard> {
     }
   }
 
-  Widget buildKey(BuildContext context, KeyboardLayout layout, KeyboardKey key, int rowNo, int keyNo) {
+  Widget buildKey(BuildContext context, KeyboardLayout layout, KeyboardKey key, int rowNo, int keyNo, Rect monitorGeometry) {
     var textColor = Colors.white;
     var backgroundColor = ButtonTheme.of(context).colorScheme!.onSurface;
 
@@ -88,7 +88,7 @@ class _KeyboardState extends State<Keyboard> {
 
     final textStyle = Theme.of(context).textTheme.labelSmall!.copyWith(
       color: textColor,
-      fontSize: key.getChildSize(context, isShifted).height,
+      fontSize: key.getChildSize(context, isShifted, monitorGeometry).height,
     );
 
     Widget? child;
@@ -125,7 +125,7 @@ class _KeyboardState extends State<Keyboard> {
       contentType: contentType
     );
     final row = currentPlane.rows[rowNo];
-    final size = key.getContainerSize(context: context, row: row, isShifted: isShifted);
+    final size = key.getContainerSize(context: context, row: row, isShifted: isShifted, monitorGeometry: monitorGeometry);
 
     return Padding(
       padding: KeyboardKey.padding,
@@ -173,56 +173,50 @@ class _KeyboardState extends State<Keyboard> {
     );
   }
 
-  Widget buildLayout(BuildContext context, KeyboardLayout layout) {
-    if (!isAnnounced) {
-      Keebie.announceLayout(layout).then((nothing) {
-        isAnnounced = true;
-      }).catchError((error, trace) {
-        handleError(error, trace: trace);
-      });
-    }
+  Widget buildLayout(BuildContext context, KeyboardLayout layout) =>
+      FutureBuilder(
+        future: Keebie.monitorGeometry,
+        builder: (context, snapshot) {
+          if (!isAnnounced) {
+            Keebie.announceLayout(layout).then((nothing) {
+              isAnnounced = true;
+            }).catchError((error, trace) {
+              handleError(error, trace: trace);
+            });
+          }
 
-    final currentPlane = layout.getPlane(
-      plane,
-      contentType: contentType
-    );
+          final monitorGeometry = snapshot.hasData ? snapshot.data! : Rect.fromLTRB(0, 0, KeebieApp.getInitialSize(context).width, KeebieApp.getInitialSize(context).height);
 
-    final size = currentPlane.getSize(context, constraints: constraints, isShifted: isShifted);
-    final realSize = size / MediaQuery.devicePixelRatioOf(context);
+          final currentPlane = layout.getPlane(
+            plane,
+            contentType: contentType
+          );
 
-    Widget layoutWidget = Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: currentPlane.rows.map((row) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: row.getKeys(constraints: constraints)
-          .asMap()
-          .map((keyNo, key) =>
-            MapEntry(
-              keyNo,
-              buildKey(context, layout, key, row.number, keyNo)
-            )
-          ).values.toList()
-      )).toList(),
-    );
+          final size = currentPlane.getSize(context, constraints: constraints, isShifted: isShifted, monitorGeometry: monitorGeometry);
 
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-      case TargetPlatform.macOS:
-      case TargetPlatform.linux:
-        appWindow.minSize = realSize;
-        appWindow.size = realSize;
-        appWindow.show();
-        break;
-      default:
-        break;
-    }
+          Widget layoutWidget = Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: currentPlane.rows.map((row) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: row.getKeys(constraints: constraints)
+                .asMap()
+                .map((keyNo, key) =>
+                  MapEntry(
+                    keyNo,
+                    buildKey(context, layout, key, row.number, keyNo, monitorGeometry)
+                  )
+                ).values.toList()
+            )).toList(),
+          );
 
-    return SizedBox(
-      width: size.width,
-      height: size.height,
-      child: layoutWidget,
-    );
-  }
+          Keebie.windowSize = Future.value(size * MediaQuery.devicePixelRatioOf(context));
+          return SizedBox(
+            width: size.width,
+            height: size.height,
+            child: layoutWidget,
+          );
+        },
+      );
 
   @override
   Widget build(BuildContext context) {

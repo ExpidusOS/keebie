@@ -13,12 +13,17 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineGroup
 import io.flutter.plugin.common.MethodChannel
 
+import kotlin.math.max
+import kotlin.math.min
+
 class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, attrs) {
     val engineGroup = FlutterEngineGroup(context)
     var engine: FlutterEngine
     val surfaceView = FlutterSurfaceView(context)
     val view = FlutterView(context, surfaceView)
     var methodChannel: MethodChannel
+    var windowWidth: Int = 0
+    var windowHeight: Int = 0
 
     init {
         engine = engineGroup.createAndRunEngine(context, null, "/keyboard/${(context as Keebie).languageTag}")
@@ -85,6 +90,24 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
                     else -> null
                   })
                 }
+                "getMonitorGeometry" -> {
+                  var displayMetrics = DisplayMetrics()
+                  context.display?.getMetrics(displayMetrics)
+
+                  result.success(mapOf("x" to 0, "y" to 0, "width" to displayMetrics.widthPixels, "height" to displayMetrics.heightPixels))
+                }
+                "setWindowSize" -> {
+                  var displayMetrics = DisplayMetrics()
+                  context.display?.getMetrics(displayMetrics)
+
+                  val height = call.argument("height") as Number?
+                  if (height != null) {
+                    windowHeight = height.toInt().coerceIn(height.toInt(), displayMetrics.heightPixels)
+                  }
+
+                  result.success(null)
+                  requestLayout()
+                }
                 "getConstraints" -> {
                   val constraints = emptyList<String>().toMutableList()
                   val keebie = context as Keebie
@@ -108,8 +131,8 @@ class KeebieView(context: Context, attrs: AttributeSet) : ViewGroup(context, att
         var displayMetrics = DisplayMetrics()
         context.display?.getMetrics(displayMetrics)
 
-        var maxWidth = Math.max(width, displayMetrics.widthPixels)
-        var maxHeight = Math.max(height, (displayMetrics.heightPixels / 3.15).toInt())
+        var maxWidth = if (windowWidth > 0) windowWidth else Math.max(width, displayMetrics.widthPixels)
+        var maxHeight = if (windowHeight > 0) windowHeight else Math.max(height, (displayMetrics.heightPixels / 3.15).toInt())
 
         measureChild(view, width, height)
         setMeasuredDimension(

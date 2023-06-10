@@ -1,3 +1,5 @@
+import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' hide KeyboardKey;
 import 'package:keebie/logic.dart';
 
@@ -51,6 +53,28 @@ class Keebie {
     final value = await _methodChannel.invokeMethod('getMonitorGeometry');
     return Offset(value['x']!.toDouble(), value['y']!.toDouble())
       & Size(value['width']!.toDouble(), value['height']!.toDouble());
+  }
+
+  static set windowSize(Future<Size> size) {
+    size.then((value) async {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+        case TargetPlatform.macOS:
+        case TargetPlatform.linux:
+          appWindow.minSize = value;
+          appWindow.size = value;
+          appWindow.show();
+          break;
+        default:
+          await _methodChannel.invokeMethod('setWindowSize', {
+            'width': value.width.round(),
+            'height': value.height.round(),
+          });
+          break;
+      }
+    }).catchError((error, trace) {
+      handleError(error, trace: trace);
+    });
   }
 
   static Future<Size> get windowSize async {
