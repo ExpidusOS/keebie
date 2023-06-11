@@ -1,5 +1,3 @@
-import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' hide KeyboardKey;
 import 'package:keebie/main.dart';
 import 'package:libtokyo_flutter/libtokyo.dart';
@@ -16,6 +14,7 @@ class Keyboard extends StatefulWidget {
     this.onLayout,
     this.plane = 0,
     this.contentType,
+    this.onSize,
     this.isShifted = false
   });
 
@@ -24,6 +23,7 @@ class Keyboard extends StatefulWidget {
     required String json,
     this.plane = 0,
     this.contentType,
+    this.onSize,
     this.isShifted = false
   }) : layout = KeyboardLayout.fromJson(json), onLayout = null;
 
@@ -32,6 +32,7 @@ class Keyboard extends StatefulWidget {
     required String name,
     this.plane = 0,
     this.contentType,
+    this.onSize,
     this.isShifted = false
   })
     : layout = null,
@@ -41,6 +42,7 @@ class Keyboard extends StatefulWidget {
   final bool isShifted;
   final KeyboardContentType? contentType;
   final KeyboardLayout? layout;
+  final void Function(Size size)? onSize;
   final Future<KeyboardLayout> Function()? onLayout;
 
   @override
@@ -209,7 +211,9 @@ class _KeyboardState extends State<Keyboard> {
             )).toList(),
           );
 
-          Keebie.windowSize = Future.value(size * MediaQuery.devicePixelRatioOf(context));
+          if (widget.onSize != null) {
+            widget.onSize!(size);
+          }
           return SizedBox(
             width: size.width,
             height: size.height,

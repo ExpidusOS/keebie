@@ -1,5 +1,6 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/foundation.dart';
+import 'package:keebie/logic.dart';
 import 'package:keebie/widgets.dart';
 import 'package:libtokyo_flutter/libtokyo.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -30,7 +31,12 @@ class _KeyboardViewState extends State<KeyboardView> {
           ),
         ) : null,
         body: Center(
-          child: Keyboard.asset(name: widget.name),
+          child: Keyboard.asset(
+            name: widget.name,
+            onSize: (size) {
+              Keebie.windowSize = Future.value(size * MediaQuery.devicePixelRatioOf(context));
+            },
+          ),
         ),
       );
 }
