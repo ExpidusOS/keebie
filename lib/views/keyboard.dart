@@ -22,11 +22,36 @@ class _KeyboardViewState extends State<KeyboardView> {
           leading: Image.asset('assets/imgs/icon.png'),
           title: Text(AppLocalizations.of(context)!.applicationTitle),
         ) : null,
+        appBar: PreferredSize(
+          preferredSize: Size(
+            MediaQuery.sizeOf(context).width,
+            AppBar.preferredHeightFor(context, const Size.fromHeight(kToolbarHeight))
+          ),
+          child: Material(
+            type: MaterialType.canvas,
+            shadowColor: AppBarTheme.of(context).shadowColor,
+            surfaceTintColor: AppBarTheme.of(context).surfaceTintColor,
+            color: AppBarTheme.of(context).backgroundColor,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () => Keebie.openWindow(keyboard: false)
+                    .catchError((error, trace) => handleError(error, trace: trace)),
+                )
+              ],
+            ),
+          ),
+        ),
         body: Center(
           child: Keyboard.asset(
             name: widget.name,
             onSize: (size) {
-              Keebie.windowSize = Future.value(size * MediaQuery.devicePixelRatioOf(context));
+              final ratio = MediaQuery.devicePixelRatioOf(context);
+              Keebie.windowSize = Future.value(Size(
+                size.width * ratio,
+                (size.height + AppBar.preferredHeightFor(context, const Size.fromHeight(kToolbarHeight))) * ratio
+              ));
             },
           ),
         ),

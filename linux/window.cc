@@ -116,6 +116,20 @@ static void keebie_window_method_call_cb(FlMethodChannel* channel, FlMethodCall*
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null()));
   } else if (g_strcmp0(method_name, "announceLayout") == 0) {
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null()));
+  } else if (g_strcmp0(method_name, "announceSettingsChange") == 0) {
+    KeebieApplication* app = KEEBIE_APPLICATION(gtk_window_get_application(GTK_WINDOW(self)));
+    g_assert(app != nullptr);
+
+    GList* windows = gtk_application_get_windows(GTK_APPLICATION(app));
+    for (size_t i = 0; i < g_list_length(windows); i++) {
+      GtkWindow* window = GTK_WINDOW(g_list_nth_data(windows, i));
+      if (KEEBIE_IS_WINDOW(window)) {
+        KeebieWindowPrivate* priv = reinterpret_cast<KeebieWindowPrivate*>(keebie_window_get_instance_private(KEEBIE_WINDOW(window)));
+        fl_method_channel_invoke_method(priv->method_channel, "onSettingsChange", nullptr, nullptr, nullptr, nullptr);
+      }
+    }
+
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_null()));
   } else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }

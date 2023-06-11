@@ -80,11 +80,11 @@ class _KeyboardState extends State<Keyboard> {
   }
 
   Widget buildKey(BuildContext context, KeyboardLayout layout, KeyboardKey key, int rowNo, int keyNo, Rect monitorGeometry) {
-    var textColor = Colors.white;
+    var textColor = Theme.of(context).colorScheme.primary;
     var backgroundColor = ButtonTheme.of(context).colorScheme!.onSurface;
 
     if (key.secondaryColors || (key.type == KeyboardKeyType.shift && isShifted)) {
-      textColor = Colors.black;
+      textColor = Theme.of(context).colorScheme.tertiary;
       backgroundColor = ButtonTheme.of(context).colorScheme!.onSecondary;
     }
 

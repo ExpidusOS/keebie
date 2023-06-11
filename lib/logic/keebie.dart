@@ -6,6 +6,30 @@ import 'package:keebie/logic.dart';
 class Keebie {
   static const _methodChannel = MethodChannel('keebie');
 
+  static void init() {
+    _methodChannel.setMethodCallHandler((call) async {
+      switch (call.method) {
+        case 'onSettingsChange':
+          if (onSettingsChange != null) {
+            return await onSettingsChange!();
+          }
+          break;
+        default:
+          return null;
+      }
+    });
+  }
+
+  static Future<void> announceSettingsChange() =>
+    _methodChannel.invokeMethod('announceSettingsChange');
+
+  static Future<dynamic> Function()? onSettingsChange;
+
+  static Future<void> openWindow({ bool keyboard = false }) =>
+    _methodChannel.invokeMethod('openWindow', {
+      'keyboard': keyboard
+    });
+
   static Future<void> sendKey(KeyboardKey key, {
     required bool isShifted,
     required int rowNo,

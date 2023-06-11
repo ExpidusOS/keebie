@@ -20,6 +20,8 @@ Future<void> _runMain({
   final isKeyboard = await Keebie.isKeyboard;
   final initialSize = await Keebie.windowSize;
 
+  Keebie.init();
+
   final app = KeebieApp(
     isSentry: isSentry,
     isKeyboard: isKeyboard,
@@ -115,6 +117,14 @@ class _KeebieAppState extends State<KeebieApp> {
 
     SharedPreferences.getInstance().then((prefs) => setState(() {
       preferences = prefs;
+
+      Keebie.onSettingsChange = () async {
+        await preferences.reload();
+        setState(() {
+          _loadSettings();
+        });
+      };
+
       _loadSettings();
     })).catchError((error, trace) {
       handleError(error, trace: trace);
@@ -122,7 +132,7 @@ class _KeebieAppState extends State<KeebieApp> {
   }
 
   void _loadSettings() {
-    colorScheme = KeebieSettings.colorScheme.valueFor(preferences);
+    colorScheme = ColorScheme.values.asNameMap()[preferences.getString(KeebieSettings.colorScheme.name) ?? 'night']!;
   }
 
   Future<void> reload() async {

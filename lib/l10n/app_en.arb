@@ -16,5 +16,6 @@
     }
   },
   "viewAbout": "About",
-  "aboutHeadingDependencies": "Dependencies"
+  "aboutHeadingDependencies": "Dependencies",
+  "settingsTheme": "Theme"
 }
