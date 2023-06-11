@@ -361,7 +361,7 @@
   },
   {
     "name": "shared_preferences",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "kind": "direct",
     "source": "hosted",
     "dependencies": [
@@ -400,7 +400,7 @@
   },
   {
     "name": "path_provider_windows",
-    "version": "2.1.6",
+    "version": "2.1.7",
     "kind": "transitive",
     "source": "hosted",
     "dependencies": [
@@ -700,63 +700,8 @@
       "libtokyo",
       "path",
       "intl",
-      "filesize"
-    ]
-  },
-  {
-    "name": "filesize",
-    "version": "2.0.1",
-    "kind": "transitive",
-    "source": "hosted",
-    "dependencies": []
-  },
-  {
-    "name": "intl",
-    "version": "0.18.0",
-    "kind": "direct",
-    "source": "hosted",
-    "dependencies": [
-      "clock",
-      "meta",
-      "path"
-    ]
-  },
-  {
-    "name": "libtokyo",
-    "version": "0.1.0",
-    "kind": "direct",
-    "source": "git",
-    "dependencies": [
-      "meta",
-      "path"
-    ]
-  },
-  {
-    "name": "material_theme_builder",
-    "version": "1.0.4",
-    "kind": "transitive",
-    "source": "hosted",
-    "dependencies": [
-      "flutter",
-      "material_color_utilities"
-    ]
-  },
-  {
-    "name": "flutter_localizations",
-    "version": "0.0.0",
-    "kind": "direct",
-    "source": "sdk",
-    "dependencies": [
-      "flutter",
-      "intl",
-      "characters",
-      "clock",
-      "collection",
-      "js",
-      "material_color_utilities",
-      "meta",
-      "path",
-      "vector_math"
+      "filesize",
+      "bitsdojo_window"
     ]
   },
   {
@@ -815,6 +760,62 @@
       "bitsdojo_window_platform_interface",
       "win32",
       "ffi"
+    ]
+  },
+  {
+    "name": "filesize",
+    "version": "2.0.1",
+    "kind": "transitive",
+    "source": "hosted",
+    "dependencies": []
+  },
+  {
+    "name": "intl",
+    "version": "0.18.0",
+    "kind": "direct",
+    "source": "hosted",
+    "dependencies": [
+      "clock",
+      "meta",
+      "path"
+    ]
+  },
+  {
+    "name": "libtokyo",
+    "version": "0.1.0",
+    "kind": "direct",
+    "source": "git",
+    "dependencies": [
+      "meta",
+      "path"
+    ]
+  },
+  {
+    "name": "material_theme_builder",
+    "version": "1.0.4",
+    "kind": "transitive",
+    "source": "hosted",
+    "dependencies": [
+      "flutter",
+      "material_color_utilities"
+    ]
+  },
+  {
+    "name": "flutter_localizations",
+    "version": "0.0.0",
+    "kind": "direct",
+    "source": "sdk",
+    "dependencies": [
+      "flutter",
+      "intl",
+      "characters",
+      "clock",
+      "collection",
+      "js",
+      "material_color_utilities",
+      "meta",
+      "path",
+      "vector_math"
     ]
   }
 ]

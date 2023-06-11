@@ -18,17 +18,9 @@ class _KeyboardViewState extends State<KeyboardView> {
   @override
   Widget build(BuildContext context) =>
       Scaffold(
-        windowBar: !kIsWeb && defaultTargetPlatform != TargetPlatform.linux && defaultTargetPlatform != TargetPlatform.android ? PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight / 2),
-          child: MoveWindow(
-            child: WindowBar(
-              leading: Image.asset('assets/imgs/icon.png'),
-              title: Text(AppLocalizations.of(context)!.applicationTitle),
-              onMinimize: () => appWindow.minimize(),
-              onMaximize: () => appWindow.maximize(),
-              onClose: () => appWindow.close(),
-            ),
-          ),
+        windowBar: !kIsWeb && defaultTargetPlatform != TargetPlatform.linux && defaultTargetPlatform != TargetPlatform.android ? WindowBar(
+          leading: Image.asset('assets/imgs/icon.png'),
+          title: Text(AppLocalizations.of(context)!.applicationTitle),
         ) : null,
         body: Center(
           child: Keyboard.asset(

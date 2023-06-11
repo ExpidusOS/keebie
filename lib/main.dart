@@ -133,7 +133,9 @@ class _KeebieAppState extends State<KeebieApp> {
   @override
   Widget build(BuildContext context) =>
     TokyoApp(
+      themeMode: colorScheme == ColorScheme.day ? ThemeMode.light : ThemeMode.dark,
       colorScheme: colorScheme,
+      colorSchemeDark: colorScheme,
       onGenerateTitle: (context) => AppLocalizations.of(context)!.applicationTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

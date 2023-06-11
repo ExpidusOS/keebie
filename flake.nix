@@ -30,7 +30,7 @@
           src = cleanSource self;
 
           depsListFile = ./deps.json;
-          vendorHash = "sha256-WNobkgQ0ghfFybKC4wQCa48JhGOmNCkorDNvVGZ4fDY=";
+          vendorHash = "sha256-L/meECAUf0Jv5glifPNjylXIzroDsJtsyXZs1BPa23c=";
 
           nativeBuildInputs = with pkgs; [
             removeReferencesTo
