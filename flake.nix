@@ -34,6 +34,7 @@
 
           nativeBuildInputs = with pkgs; [
             removeReferencesTo
+            pkg-config
           ];
 
           buildInputs = with pkgs; [
