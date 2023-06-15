@@ -16,5 +16,6 @@
     }
   },
   "viewAbout": "について",
-  "aboutHeadingDependencies": "依存関係"
+  "aboutHeadingDependencies": "依存関係",
+  "settingsTheme": "Theme"
 }
